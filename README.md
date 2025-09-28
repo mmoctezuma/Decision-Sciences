@@ -1,18 +1,19 @@
 # CO₂ Emissions Forecasting and Classification
 
-This repository contains a complete pipeline to download, process, and model World Bank data with the goal of **predicting and classifying CO₂ emissions behavior** under different scenarios.
+This repository contains a complete pipeline to download, process, and model World Bank data with the goal of predicting and classifying CO₂ emissions behavior and running scenario analyses.
 
-It includes:
-- **ETL scripts** for data download and preprocessing.
-- Econometric and machine learning models (XGBoost).
+Includes:
+- ETL scripts for data download and preprocessing.
+- Econometric (Fixed Effects) and ML (XGBoost) models.
 - Binary classification of 10-year CO₂ changes.
-- Organized folders with results and metrics.
+- EV adoption scenario (EV50) analysis.
+- Organized folders with results, metrics, predictions, and reports.
 
 ---
 
 ## Installation
 
-This project uses [`uv`](https://github.com/astral-sh/uv) for environment and dependency management.
+This project uses [`uv`](https://github.com/astral-sh/uv) for environment and dependency management (Python 3.10+).
 
 ```bash
 # Create virtual environment
@@ -26,6 +27,13 @@ source .venv/bin/activate   # Linux / Mac
 uv sync
 ```
 
+Alternative (pip):
+```bash
+python -m venv .venv
+source .venv/bin/activate   # or .venv\\Scripts\\activate on Windows
+pip install -e .
+```
+
 ---
 
 ## Repository Structure
@@ -34,25 +42,38 @@ uv sync
 .
 ├── ETL/
 │   ├── download_from_WDI.py              # Downloads World Bank indicators → data/raw_data
-│   └── etl_preprocess_and_summary.py     # Preprocesses and generates summaries → data/processed
+│   ├── etl_preprocess_and_summary.py     # Preprocesses and generates summaries → data/processed
+│   └── summary_report.md                 # ETL notes and data overview
 │
 ├── models/
 │   ├── co2_models.py                     # XGBoost & Fixed Effects models, GDP shock scenarios
 │   ├── classify_10years.py               # Predict CO₂ + compare past vs future decade
-│   └── co2_classifier.py                 # Classifier (Logit + XGB) on target binary column
+│   ├── co2_classifier.py                 # Classifier (Logit + XGB) on target binary column
+│   ├── fe_log_log_model.py               # Alternative FE log–log pipeline (+ per-country option)
+│   ├── ev50_scenario.py                  # EV50 scenario (50% EV adoption) impact analysis
+│   ├── positive_and_shap_tables.py       # Utilities: positive-class table, regional share, SHAP table
+│   ├── REPORT_CO2_MODELS.md              # Extended model report (FE/XGB)
+│   └── REPORT_CO2_CLASSIFIER.md          # Classifier methodology and insights
 │
 ├── data/
 │   ├── raw_data/                         # Raw World Bank downloads
-│   └── processed/                        # Processed datasets ready for modeling
+│   ├── processed/                        # Processed datasets ready for modeling
+│   └── ev_adoption_v2.csv                # EV adoption & fleet input (for EV50 scenario)
 │
 ├── model_results/
-│   ├── metricas_fe.json                  # FE model metrics
-│   ├── metricas_xgb.json                 # XGB model metrics
-│   ├── predictions_fe.csv                # FE model predictions (last decades)
-│   ├── predictions_xgb.csv               # XGB model predictions (last decades)
+│   ├── metrics_fe.csv                    # FE model metrics
+│   ├── metrics_xgb.csv                   # XGB model metrics
+│   ├── predictions_fe.csv                # FE baseline predictions (if --predict)
+│   ├── predictions_xgb.csv               # XGB baseline predictions (if --predict)
+│   ├── scenario_xgb_10pct.csv            # XGB +10% GDP scenario (if run without --predict)
 │   ├── compare_10years.csv               # Past vs future decade comparison
-│   ├── fe/                               # Additional FE results
-│   └── classifier/                       # Classifier results (metrics, pickle models)
+│   ├── fe/                               # Alternative FE pipeline outputs
+│   │   ├── model_summary.txt
+│   │   ├── metrics.csv
+│   │   ├── predictions_full.csv
+│   │   ├── elasticity_table.csv
+│   │   └── scenario_gdp_plus10pct.csv
+│   └── classifier/                       # Classifier results (metrics, models)
 │
 └── README.md
 ```
@@ -70,6 +91,26 @@ python ETL/download_from_WDI.py \
 ```
 
 ### 2. ETL
+
+### Tables and SHAP summaries (optional)
+
+Produce positive-class and regional share tables from the 10‑year comparison; optionally compute SHAP global importance (requires xgboost + shap):
+
+```bash
+# From decade comparison
+python models/positive_and_shap_tables.py \
+  --compare_csv model_results/compare_10years.csv \
+  --outdir model_results/classifier \
+  --positive_table --regional_share
+
+# With SHAP global importance (requires test features)
+python models/positive_and_shap_tables.py \
+  --compare_csv model_results/compare_10years.csv \
+  --outdir model_results/classifier \
+  --add_shap \
+  --xgb_model_path model_results/classifier/xgb_classifier_model.json \
+  --x_test_csv path/to/X_test.csv
+```
 
 You can run the ETL script in different modes depending on your needs:
 
@@ -117,7 +158,39 @@ python models/co2_models.py \
   --model_type xgb --split_year 2020 --shock_pct 10
 ```
 
-### 4. 10-year classification
+Alternative FE pipeline (log–log), with additional artifacts and optional per‑country run:
+
+```bash
+# All countries, with time effects and +10% GDP elasticity table
+python models/fe_log_log_model.py \
+  --input_file data/processed/wide_clean.csv \
+  --output_dir model_results/fe \
+  --time_effects --shock_pct 10
+
+# Single country example (Mexico), using last available year as base
+python models/fe_log_log_model.py \
+  --input_file data/processed/wide_clean.csv \
+  --output_dir model_results/fe \
+  --country MEX --time_effects --shock_pct 10
+```
+
+### 4. EV50 scenario (50% EV adoption)
+
+Estimate CO₂ reductions if 50% of fleet shifts to EVs (uses electricity mix, fleet and adoption data).
+
+```bash
+python models/ev50_scenario.py \
+  --wide_csv data/processed/wide_clean.csv \
+  --ev_csv data/ev_adoption_v2.csv \
+  --outdir model_results/ev50 \
+  --target_share 0.50 --ice_g_per_km 180 --ev_kwh_per_km 0.18 \
+  --km_per_vehicle 12000 --transport_cap_pct 0.20
+```
+
+Outputs in `model_results/ev50/`:
+- `ev50_results.csv`, `ev50_results_capped.csv`, `ev50_sensitivity_capped.csv`, `ev50_top_abs.csv`, `ev50_top_pct.csv`
+
+### 5. 10-year classification
 
 ```bash
 python -m models.classify_10years \
@@ -129,7 +202,7 @@ python -m models.classify_10years \
   --controls SP.POP.TOTL SP.URB.TOTL.IN.ZS EG.USE.PCAP.KG.OE
 ```
 
-### 5. Final classifier (Logit + XGB)
+### 6. Final classifier (Logit + XGB)
 
 ```bash
 python models/co2_classifier.py \
@@ -142,13 +215,15 @@ python models/co2_classifier.py \
 
 ## Expected results
 
-- **Metrics (FE & XGB):** stored in `model_results/metricas_fe.json` and `metricas_xgb.json`.
-- **Predictions:** stored in `predictions_fe.csv` and `predictions_xgb.csv`.
-- **10-year comparison:** `compare_10years.csv`.
-- **Classifiers:** available in `model_results/classifier/` with metrics and serialized models.
+- Metrics: `model_results/metrics_fe.csv`, `model_results/metrics_xgb.csv` (and `model_results/fe/metrics.csv` in the alt FE pipeline).
+- Predictions (if `--predict`): `model_results/predictions_fe.csv`, `model_results/predictions_xgb.csv` (or `model_results/fe/predictions_full.csv`).
+- XGB scenario: `model_results/scenario_xgb_10pct.csv`.
+- 10-year comparison: `model_results/compare_10years.csv`.
+- Classifier artifacts: `model_results/classifier/metrics_classifier.csv`, `logit_model.pkl`, `xgb_classifier_model.json`.
+- EV50 scenario outputs: `model_results/ev50/ev50_results*.csv`, `ev50_top_abs.csv`, `ev50_top_pct.csv`.
 
 ---
 
 ## Credits
 
-Developed as part of a test project on modeling and analyzing CO₂ emissions using World Bank data.
+Developed as a project on modeling and analyzing CO₂ emissions using World Bank data.

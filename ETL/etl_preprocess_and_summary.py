@@ -317,6 +317,83 @@ def preprocess_with_policy(
 # =========================
 #  Post-summaries (opcionales)
 # =========================
+def _max_consecutive_valid(years_sorted, mask_sorted):
+    # Devuelve la racha máxima consecutiva de años con dato (True) dentro del vector ordenado por año
+    max_run = run = 0
+    prev_year = None
+    for y, ok in zip(years_sorted, mask_sorted):
+        if not ok:
+            run = 0
+            prev_year = y
+            continue
+        if prev_year is None or y == prev_year + 1:
+            run += 1
+        else:
+            run = 1
+        max_run = max(max_run, run)
+        prev_year = y
+    return max_run
+
+
+def compute_country_coverage_by_series(wide: pd.DataFrame, outdir: str, min_years: int = 11):
+    """
+    Calcula cobertura por serie a nivel país:
+      - países con >=1 dato
+      - países con >=min_years datos (no consecutivos)
+      - países con >=min_years consecutivos (para ventanas de 10 años del classifier)
+    Guarda CSV en summary_first/country_coverage_by_series.csv
+    """
+    os.makedirs(outdir, exist_ok=True)
+    id_cols = ["iso3c", "Country", "year", "region"]
+    series_cols = [c for c in wide.columns if c not in id_cols]
+    n_countries_total = wide["iso3c"].nunique()
+
+    g = wide.sort_values(["iso3c", "year"])
+    rows = []
+    for s in series_cols:
+        any_cnt = 0
+        ge_minyrs_cnt = 0
+        ge_minyrs_consec_cnt = 0
+
+        for iso, sub in g[["iso3c", "year", s]].groupby("iso3c"):
+            vals = pd.to_numeric(sub[s], errors="coerce")
+            mask = vals.notna().to_numpy()
+            years = sub["year"].to_numpy()
+
+            any_has = mask.any()
+            if any_has:
+                any_cnt += 1
+
+            ge_minyrs = (mask.sum() >= min_years)
+            if ge_minyrs:
+                ge_minyrs_cnt += 1
+
+            # consecutivos
+            max_run = _max_consecutive_valid(years, mask)
+            if max_run >= min_years:
+                ge_minyrs_consec_cnt += 1
+
+        rows.append({
+            "series": s,
+            "n_countries_total": n_countries_total,
+            "n_countries_any": any_cnt,
+            "pct_countries_any": 100.0 * any_cnt / n_countries_total if n_countries_total else 0.0,
+            "n_countries_ge_minyrs": ge_minyrs_cnt,
+            "pct_countries_ge_minyrs": 100.0 * ge_minyrs_cnt / n_countries_total if n_countries_total else 0.0,
+            "n_countries_ge_minyrs_consec": ge_minyrs_consec_cnt,
+            "pct_countries_ge_minyrs_consec": 100.0 * ge_minyrs_consec_cnt / n_countries_total if n_countries_total else 0.0,
+            "min_years": min_years
+        })
+
+    out = pd.DataFrame(rows).sort_values(
+        ["pct_countries_ge_minyrs_consec", "pct_countries_ge_minyrs", "pct_countries_any"],
+        ascending=False
+    )
+    out.to_csv(os.path.join(outdir, "country_coverage_by_series.csv"), index=False)
+    return out
+
+
+
 def summarize_after_preprocess(wide_clean: pd.DataFrame, outdir: str, focus_year: int = 2020):
     _ensure_dir(outdir)
     id_cols = ["iso3c", "Country", "year", "region"]
@@ -352,7 +429,7 @@ def summarize_after_preprocess(wide_clean: pd.DataFrame, outdir: str, focus_year
 def main():
     parser = argparse.ArgumentParser(description="ETL + Summarize + Preprocess (WDI CSV con columnas YR####).")
     parser.add_argument("--input", required=True, help="CSV con columnas YR####, series, Series, iso3c, Country.")
-    parser.add_argument("--workdir", default="out", help="Directorio de trabajo/salidas.")
+    parser.add_argument("--workdir", default="data/processed", help="Directorio de trabajo/salidas.")
     parser.add_argument("--start", type=int, default=1960, help="Año inicial (filtro).")
     parser.add_argument("--end", type=int, default=2022, help="Año final (filtro).")
     parser.add_argument("--focus_year", type=int, default=2020, help="Año para rankings/cortes.")
@@ -390,6 +467,7 @@ def main():
 
         # 4) Summaries AFTER (opcionales)
         summarize_after_preprocess(wide_clean, os.path.join(args.workdir, "summary_after"), args.focus_year)
+        compute_country_coverage_by_series(wide, args.workdir, min_years=11)
 
     print("ETL finalizado.")
 

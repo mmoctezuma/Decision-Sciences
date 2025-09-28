@@ -1,68 +1,56 @@
-# World Bank CO₂ & Socio-Economic Indicators – Summary Report
+# World Bank CO₂ & Socio-Economic Indicators – Extended Summary Report
 
 ## 1. Dataset Overview
-- **Source:** World Development Indicators (World Bank, 1960–2022).
-- **Scope:** ~200 countries, 30+ socio-economic, environmental, and energy indicators.
+- **Source:** World Development Indicators (World Bank, 1990–2022).
+- **Scope:** Around 200 countries, covering 30+ socio-economic, environmental, and energy indicators.
 - **Structure:**
   - Identifiers: `iso3c`, `Country`, `year`.
-  - Indicators: CO₂ emissions, GDP, population, energy use, urbanization, education, R&D, etc.
-- **Observations:** Not all countries report all indicators every year → missing values are frequent, especially in early decades.
-
----
+  - Indicators: CO₂ emissions, GDP, population, energy use, urbanization, education, R&D, investment, etc.
+- **Coverage:** Missing values are frequent, especially in early decades, as shown in `country_coverage_by_series.csv`.
 
 ## 2. Preprocessing Steps
-- **Reshape:** Converted WDI format (`YR####` columns) to panel data (`year` column).
+- **Reshape:** Converted raw WDI format (`YR####` columns) into panel data (`year` column).
 - **Interpolation (no extrapolation):**
-  - **Levels with growth trend** (e.g., GDP, population, CO₂ total) → log-linear interpolation.
-  - **Per-capita indicators** (e.g., GDP per capita, CO₂ per capita) → linear interpolation.
-  - **Rates 0–100** (e.g., urbanization %, renewables %, school enrollment) → linear interpolation + clamped to [0,100].
-  - **Other ratios/indices** (e.g., energy intensity, R&D % GDP) → linear interpolation.
-- **No medians for borders:** Missing values at the start/end of a country’s series are left as NaN.
-- **Winsorization:** Applied only to per-capita/tasa indicators at 1% tails to reduce extreme outliers.
-- **Duplication check:** Collapsed duplicate `(iso3c, year)` rows by averaging.
+  - Levels with growth trend (e.g., GDP, population, CO₂ total) → log-linear interpolation.
+  - Per-capita indicators (e.g., GDP per capita, CO₂ per capita) → linear interpolation.
+  - Rates 0–100 (e.g., urbanization %, renewables %, school enrollment) → linear interpolation, clamped to [0,100].
+  - Other ratios/indices (e.g., energy intensity, R&D % GDP) → linear interpolation.
+- **Winsorization:** Applied only to per-capita and share-rate indicators (1% tails).
+- **Gaps:** Internal gaps per country/series were quantified (`country_series_gaps.csv`).
+- **Series policy:** Each variable classified by recommended transformation and bounds (`recommendations.csv`).
 
----
+## 3. Key Statistics
+Selected indicators from `stats_preview.csv` and `summary_statistics.csv`:
 
-## 3. Key Statistics (selected indicators)
-| Indicator | Median | P01 | P99 | Coverage | Notes |
-|-----------|--------|-----|-----|----------|-------|
-| **GDP (NY.GDP.MKTP.CD)** | \$8.2B | \$22M | \$7.1T | ~95% | Wide dispersion, skewed by US/China. |
-| **CO₂ emissions total (EN.ATM.CO2E.KT)** | 11,200 kt | 80 kt | 9,870,000 kt | ~90% | Highly concentrated in a few economies. |
-| **CO₂ per capita (EN.ATM.CO2E.PC)** | 3.9 t | 0.2 t | 18.5 t | ~88% | Outliers trimmed via winsorization. |
-| **Population (SP.POP.TOTL)** | 9.3M | 0.2M | 1.4B | ~99% | Very complete series. |
-| **Urbanization rate (SP.URB.TOTL.IN.ZS)** | 56% | 14% | 92% | ~92% | Smooth, monotonic increase in most countries. |
+| Indicator | Median | P01 | P99 | Missing % |
+|-----------|--------|-----|-----|-----------|
+| NY.GDP.MKTP.CD | 13899217679.92 | 77347018.63 | 4601224878604.01 | 5.1% |
+| EN.GHG.CO2.MT.CE.AR5 | 8.26 | 0.00 | 2550.18 | 6.5% |
+| EN.GHG.CO2.PC.CE.AR5 | 2.16 | 0.00 | 33.01 | 6.5% |
+| SP.POP.TOTL | 5386675.50 | 15211.39 | 327050431.64 | 0.0% |
+| SP.URB.TOTL.IN.ZS | 57.12 | 13.12 | 100.00 | 0.9% |
 
----
-
-## 4. Correlations (Pearson, global panel 1960–2022)
-- **GDP vs. CO₂ total**: **+0.84** → economic activity strongly associated with emissions.
-- **GDP per capita vs. CO₂ per capita**: **+0.71** → richer countries emit more per person.
-- **Urbanization vs. energy per capita**: **+0.65** → urbanization drives higher energy needs.
-- **Renewables share vs. CO₂ per capita**: **–0.48** → cleaner mixes reduce per-capita emissions.
-- **Education enrollment vs. GDP per capita**: **+0.62** → strong co-movement with development.
-
----
+## 4. Correlations (Pearson, 1990–2022)
+- **GDP vs. CO2 total**: 0.80
+- **GDP per capita vs. CO2 per capita**: 0.31
+- **Urbanization vs. energy per capita**: 0.56
+- **Renewables share vs. CO2 per capita**: -0.35
+- **Secondary education vs. GDP per capita**: 0.50
 
 ## 5. Notable Patterns & Anomalies
-- **Top emitters 2020 (CO₂ total):** China, USA, India, Russia, Japan, Germany, Iran, South Korea, Canada, Saudi Arabia.
-- **Biggest reducers (CO₂ per capita 2000–2020):** Several European countries (UK, Germany) show marked declines due to energy transition.
-- **Fastest growth (CO₂ per capita 2000–2020):** Emerging economies (China, Vietnam, some Middle East) show sharp increases.
-- **Anomalies:**
-  - Some small island nations have erratic CO₂ per capita due to reporting noise.
-  - Very low early values for GDP in some African economies reflect limited data rather than real stagnation.
-
----
+- **Top emitters 2020:** China, USA, India, Russia, Japan, Germany, Iran, South Korea, Canada, Saudi Arabia.
+- **Reductions 2000–2020:** European countries (UK, Germany) show clear declines in CO₂ per capita.
+- **Fast increases 2000–2020:** Emerging economies (China, Vietnam, Middle East) show sharp rises.
+- **Anomalies:** Small island nations report volatile per-capita CO₂ due to small denominators; early GDP values in some African economies reflect sparse reporting.
 
 ## 6. Caveats & Limitations
-- **Missingness:** Early decades (1960s–1970s) have sparse coverage for education, R&D, energy mix.
-- **Interpolation limits:** Values at start/end remain NaN to avoid inventing data.
-- **Outliers:** Winsorization mitigates, but some anomalies persist (e.g., oil-rich small states).
-- **Causality caution:** Correlations show associations, not direct causal links.
-
----
+- Sparse coverage in education, R&D, and energy mix indicators before 1980s.
+- Interpolation does not extrapolate at series edges (values remain NaN).
+- Winsorization mitigates outliers but anomalies remain (e.g., oil-rich microstates).
+- Correlations show associations only, not causation.
 
 ## 7. Next Steps
-- Enrich with **policy data** (e.g., Paris Agreement commitments).
-- Build **panel regressions / ML models** to quantify drivers of emissions.
-- Explore **heterogeneity by income group & region**.
-
+- Integrate policy data (e.g., Paris Agreement, subsidies).
+- Estimate panel regressions and ML models to quantify drivers of emissions.
+- Explore heterogeneity by income group and region.
+- Use dataset for scenario analysis (GDP shocks, renewable expansion, urbanization).

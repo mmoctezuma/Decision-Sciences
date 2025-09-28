@@ -31,10 +31,9 @@ from models.co2_models import fit_xgb
 logger = logging.getLogger(__name__)
 
 
-"""Projection helpers moved to models.helpers"""
-
-
-# --------------------- Limpieza y manejo del mix eléctrico --------------------- #
+# =========================
+#  Helper functions
+# =========================
 MIX_COLS = [
     "EG.ELC.COAL.ZS", "EG.ELC.NGAS.ZS", "EG.ELC.PETR.ZS",
     "EG.ELC.NUCL.ZS", "EG.ELC.HYRO.ZS", "EG.ELC.RNEW.ZS"
@@ -130,7 +129,6 @@ def increase_share(df_sc: pd.DataFrame, inc_col: str, inc_pp_total: float, years
     return pd.DataFrame(out)
 
 
-# --------------------- Probabilidad desde reducción % --------------------- #
 def calibrated_probability(reduction_pct: pd.Series, k: float = 0.08) -> pd.Series:
     """
     Sigmoide centrada en 0%: 0% -> ~0.50 ; -10% -> ~0.80 ; -20% -> ~0.93
@@ -140,7 +138,9 @@ def calibrated_probability(reduction_pct: pd.Series, k: float = 0.08) -> pd.Seri
     return 1.0 / (1.0 + np.exp(-k * x))
 
 
-# --------------------- Escenario principal --------------------- #
+# =========================
+#  MAIN SCENARIO
+# =========================
 def run_scenario(
     panel_csv: str,
     output_dir: str,
@@ -347,6 +347,9 @@ def run_scenario(
     return res_out, prio_out, global_summary
 
 
+# =========================
+#  MAIN
+# =========================
 def parse_args():
     p = argparse.ArgumentParser(description="5-year renewables investment scenario + prioritization")
     p.add_argument("--input_file", default="data/processed/wide_clean.csv", help="Panel CSV")

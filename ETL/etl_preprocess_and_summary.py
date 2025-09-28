@@ -368,7 +368,7 @@ def main():
     # 1) Load & reshape
     wide, series_name_map, dfl = load_and_reshape_from_YR(args.input)
     wide.to_csv(os.path.join(args.workdir, "wide_raw.csv"), index=False)
-    dfl.to_csv(os.path.join(args.workdir, "long_format.csv"), index=False)
+    # dfl.to_csv(os.path.join(args.workdir, "long_format.csv"), index=False)
     pd.Series(series_name_map).to_csv(os.path.join(args.workdir, "series_name_map.csv"))
 
     # 2) Summarize BEFORE

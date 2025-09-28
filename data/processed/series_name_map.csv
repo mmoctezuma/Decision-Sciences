@@ -1,33 +1,41 @@
 ,0
-AG.LND.ARBL.ZS,Arable land (% of land area)
-AG.LND.FRST.K2,Forest area (sq. km)
-AG.LND.FRST.ZS,Forest area (% of land area)
 EG.ELC.COAL.ZS,Electricity production from coal sources (% of total)
+EG.ELC.FOSL.ZS,"Electricity production from oil, gas and coal sources (% of total)"
 EG.ELC.HYRO.ZS,Electricity production from hydroelectric sources (% of total)
 EG.ELC.NGAS.ZS,Electricity production from natural gas sources (% of total)
+EG.ELC.NUCL.ZS,Electricity production from nuclear sources (% of total)
 EG.ELC.PETR.ZS,Electricity production from oil sources (% of total)
 EG.ELC.RNEW.ZS,Renewable electricity output (% of total electricity output)
+EG.ELC.RNWX.KH,"Electricity production from renewable sources, excluding hydroelectric (kWh)"
+EG.ELC.RNWX.ZS,"Electricity production from renewable sources, excluding hydroelectric (% of total)"
 EG.FEC.RNEW.ZS,Renewable energy consumption (% of total final energy consumption)
 EG.GDP.PUSE.KO.PP.KD,GDP per unit of energy use (constant 2021 PPP $ per kg of oil equivalent)
 EG.USE.COMM.FO.ZS,Fossil fuel energy consumption (% of total)
+EG.USE.COMM.GD.PP.KD,"Energy use (kg of oil equivalent) per $1,000 GDP (constant 2021 PPP)"
+EG.USE.CRNW.ZS,Combustible renewables and waste (% of total energy)
 EG.USE.ELEC.KH.PC,Electric power consumption (kWh per capita)
 EG.USE.PCAP.KG.OE,Energy use (kg of oil equivalent per capita)
 EN.GHG.CO2.LU.MT.CE.AR5,Carbon dioxide (CO2) net fluxes from LULUCF - Total excluding non-tropical fires (Mt CO2e)
 EN.GHG.CO2.MT.CE.AR5,Carbon dioxide (CO2) emissions (total) excluding LULUCF (Mt CO2e)
 EN.GHG.CO2.PC.CE.AR5,Carbon dioxide (CO2) emissions excluding LULUCF per capita (t CO2e/capita)
 EN.GHG.CO2.RT.GDP.PP.KD,Carbon intensity of GDP (kg CO2e per 2021 PPP $ of GDP)
+EN.GHG.CO2.TR.MT.CE.AR5,Carbon dioxide (CO2) emissions from Transport (Energy) (Mt CO2e)
 EN.GHG.CO2.ZG.AR5,Carbon dioxide (CO2) emissions (total) excluding LULUCF (% change from 1990)
 GB.XPD.RSDV.GD.ZS,Research and development expenditure (% of GDP)
+IE.PPI.ENGY.CD,Investment in energy with private participation (current US$)
+IE.PPI.ICTI.CD,Investment in ICT with private participation (current US$)
+IE.PPI.TRAN.CD,Investment in transport with private participation (current US$)
+IE.PPI.WATR.CD,Investment in water and sanitation with private participation (current US$)
+IE.PPN.ENGY.CD,Public private partnerships investment in energy (current US$)
+IE.PPN.ICTI.CD,Public private partnerships investment in ICT (current US$)
+IE.PPN.TRAN.CD,Public private partnerships investment in transport (current US$)
+IE.PPN.WATR.CD,Public private partnerships investment in water and sanitation (current US$)
 IT.NET.USER.ZS,Individuals using the Internet (% of population)
 NY.GDP.MKTP.CD,GDP (current US$)
 NY.GDP.PCAP.CD,GDP per capita (current US$)
-NY.GNP.PCAP.CD,"GNI per capita, Atlas method (current US$)"
-NY.GNP.PCAP.PP.CD,"GNI per capita, PPP (current international $)"
 SE.ADT.LITR.ZS,"Literacy rate, adult total (% of people ages 15 and above)"
 SE.SEC.ENRR,"School enrollment, secondary (% gross)"
 SE.TER.ENRR,"School enrollment, tertiary (% gross)"
 SE.XPD.TOTL.GD.ZS,"Government expenditure on education, total (% of GDP)"
-SP.DYN.LE00.IN,"Life expectancy at birth, total (years)"
 SP.POP.TOTL,"Population, total"
 SP.URB.TOTL.IN.ZS,Urban population (% of total population)
-,

@@ -92,16 +92,18 @@ def compute_metrics(y_true, y_pred, label="") -> dict:
 # ====================================================
 def fit_panel_fe(X, ln_controls, use_time_effects, cluster_entity, single_country):
     Xp = X.set_index(["iso3c", "year"]).sort_index()
-    rhs = "ln_GDP"
-    if ln_controls:
-        rhs += " + " + " + ".join(ln_controls)
-
-    if single_country:
-        rhs_fe = rhs + ((" + TimeEffects") if use_time_effects else "")
-    else:
-        rhs_fe = rhs + " + EntityEffects" + ((" + TimeEffects") if use_time_effects else "")
-
-    mod = PanelOLS.from_formula(f"ln_CO2 ~ {rhs_fe}", data=Xp)
+    rhs_vars = ["ln_GDP"] + (ln_controls if ln_controls else [])
+    y = Xp["ln_CO2"]
+    Xvars = Xp[rhs_vars]
+    
+    mod = PanelOLS(
+        y, 
+        Xvars, 
+        entity_effects=not single_country,
+        time_effects=use_time_effects,
+        drop_absorbed=True,
+        check_rank=False
+    )
     cov_kw = {"cluster_entity": True} if (cluster_entity and not single_country) else {}
     res = mod.fit(cov_type="clustered" if cov_kw else "unadjusted", **cov_kw)
     beta = res.params["ln_GDP"]
@@ -146,7 +148,7 @@ def main():
     parser.add_argument("--output_dir", required=True)
     parser.add_argument("--target", default="EN.GHG.CO2.MT.CE.AR5")
     parser.add_argument("--gdp", default="NY.GDP.MKTP.CD")
-    parser.add_argument("--controls", nargs="*", default=["SP.POP.TOTL", "SP.URB.TOTL.IN.ZS", "EG.USE.PCAP.KG.OE"])
+    parser.add_argument("--controls", nargs="*", default=['SP.POP.TOTL', 'SP.URB.TOTL.IN.ZS', 'EG.FEC.RNEW.ZS'])
     parser.add_argument("--time_effects", action="store_true")
     parser.add_argument("--shock_pct", type=float, default=10.0)
     parser.add_argument("--model_type", choices=["fe", "xgb"], default="fe")

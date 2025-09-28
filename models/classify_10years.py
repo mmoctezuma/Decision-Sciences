@@ -108,7 +108,7 @@ if __name__ == "__main__":
     parser.add_argument("--output_file_df", default="data/processed/panel_target.csv", help="Archivo CSV de salida para df con target")
     parser.add_argument("--target", default="EN.GHG.CO2.MT.CE.AR5", help="Variable target CO2")
     parser.add_argument("--gdp", default="NY.GDP.MKTP.CD", help="Variable PIB")
-    parser.add_argument("--controls", nargs="+", default=["SP.POP.TOTL", "SP.URB.TOTL.IN.ZS", "EG.USE.PCAP.KG.OE"], help="Variables de control")
+    parser.add_argument("--controls", nargs="+", default=['SP.POP.TOTL', 'SP.URB.TOTL.IN.ZS', 'EG.FEC.RNEW.ZS'], help="Variables de control")
     args = parser.parse_args()
 
     main(args.input_file, args.output_file_compare, args.output_file_df, args.target, args.gdp, args.controls)

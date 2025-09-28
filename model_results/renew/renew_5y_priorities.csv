@@ -1,0 +1,182 @@
+iso3c,Country,CO2_base_5y,delta_EG.ELC.HYRO.ZS,delta_EG.ELC.RNEW.ZS,priority_tech
+ABW,Aruba,0.182482,-2.8685331,14.269245,hydro
+AFG,Afghanistan,11.069045,22.529734,20.473516,non_hydro_renewables
+AGO,Angola,34.317287,-0.26768446,-3.2552123,non_hydro_renewables
+ALB,Albania,6.71801,4.507327,2.483058,non_hydro_renewables
+ARG,Argentina,205.53044,5.019307,4.295957,non_hydro_renewables
+ARM,Armenia,11.310542,2.693081,0.07878542,non_hydro_renewables
+AUS,Australia,341.56387,5.0159693,3.6768675,non_hydro_renewables
+AUT,Austria,49.369938,-4.088366,-2.39864,hydro
+AZE,Azerbaijan,75.49373,0.46651363,0.0,non_hydro_renewables
+BDI,Burundi,1.617293,35.436047,11.945522,non_hydro_renewables
+BEL,Belgium,104.46492,-1.894176,-3.0394256,non_hydro_renewables
+BEN,Benin,7.0695467,6.283951,0.675714,non_hydro_renewables
+BFA,Burkina Faso,5.3670716,4.079449,4.2232156,hydro
+BGD,Bangladesh,165.27412,3.7294626,25.83331,hydro
+BGR,Bulgaria,40.562187,7.688725,11.738443,hydro
+BIH,Bosnia and Herzegovina,14.630157,4.255414,3.406489,non_hydro_renewables
+BLR,Belarus,38.485134,-2.2939742,5.666554,hydro
+BLZ,Belize,1.041472,-36.390244,-36.675465,non_hydro_renewables
+BOL,Bolivia,33.17009,-0.2425909,-1.8556356,non_hydro_renewables
+BRA,Brazil,444.1197,-14.441305,-8.579201,hydro
+BRB,Barbados,1.3718746,-32.911892,-21.907484,hydro
+BTN,Bhutan,1.5661409,81.3344,59.75809,non_hydro_renewables
+BWA,Botswana,11.987188,19.795525,-4.032159,non_hydro_renewables
+CAF,Central African Republic,0.49242797,32.116425,2.5384903,non_hydro_renewables
+CAN,Canada,291.26675,20.925081,19.152987,non_hydro_renewables
+CHE,Switzerland,65.037926,0.7554054,-2.7872622,non_hydro_renewables
+CHL,Chile,150.15347,10.969806,7.3952556,non_hydro_renewables
+CHN,China,10144.604,7.8491807,6.7406654,non_hydro_renewables
+CIV,Cote d'Ivoire,19.941946,4.5467377,0.70192814,non_hydro_renewables
+CMR,Cameroon,11.691814,-5.1426706,-1.2426734,hydro
+COD,"Congo, Dem. Rep.",7.494151,13.452268,4.7243357,non_hydro_renewables
+COG,"Congo, Rep.",5.9128065,2.494502,-0.38514137,non_hydro_renewables
+COL,Colombia,228.69345,-4.885703,-6.6678762,non_hydro_renewables
+COM,Comoros,0.60856754,-0.12896061,3.1778097,hydro
+CPV,Cabo Verde,1.559702,-5.104822,0.5439162,hydro
+CRI,Costa Rica,20.70634,0.47240257,-0.24981499,non_hydro_renewables
+CUB,Cuba,52.387993,1.8447161,2.0797253,hydro
+CYP,Cyprus,8.117472,-2.1059215,1.1209846,hydro
+CZE,Czechia,76.59545,2.1421194,1.3149381,non_hydro_renewables
+DEU,Germany,480.19962,36.906624,36.094116,non_hydro_renewables
+DJI,Djibouti,1.5454671,4.1365623,-5.4051876,non_hydro_renewables
+DMA,Dominica,0.106545314,-7.184303,-11.583728,non_hydro_renewables
+DNK,Denmark,29.674017,8.498323,7.2624445,non_hydro_renewables
+DOM,Dominican Republic,84.90584,-6.12722,-6.5123796,non_hydro_renewables
+DZA,Algeria,268.0291,-11.363066,-4.2865396,hydro
+ECU,Ecuador,70.512375,1.6545534,3.7683606,hydro
+EGY,"Egypt, Arab Rep.",271.3646,1.2102485,1.1642694,non_hydro_renewables
+ERI,Eritrea,1.5559938,12.5959635,-7.381505,non_hydro_renewables
+ESP,Spain,258.7137,2.9007912,1.5449166,non_hydro_renewables
+EST,Estonia,12.114156,33.781635,35.694443,hydro
+ETH,Ethiopia,42.27002,5.551231,0.87434053,non_hydro_renewables
+FIN,Finland,36.515747,-0.24365783,-0.58006644,non_hydro_renewables
+FJI,Fiji,2.4859633,5.750978,-4.929507,non_hydro_renewables
+FRA,France,552.48145,-6.0180244,-6.200981,non_hydro_renewables
+FRO,Faroe Islands,0.008882647,-20.509672,-20.931412,non_hydro_renewables
+GAB,Gabon,3.971971,12.696004,5.1820517,non_hydro_renewables
+GBR,United Kingdom,355.97693,-3.626442,-7.616848,non_hydro_renewables
+GEO,Georgia,11.758675,1.1463046,-2.5653303,non_hydro_renewables
+GHA,Ghana,30.462183,5.4847,-0.47616363,non_hydro_renewables
+GIN,Guinea,5.968061,36.887074,27.272308,non_hydro_renewables
+GMB,"Gambia, The",1.8451017,6.284559,1.2606502,non_hydro_renewables
+GNB,Guinea-Bissau,0.6157897,0.90521574,-5.294621,non_hydro_renewables
+GNQ,Equatorial Guinea,9.149486,42.494057,41.188026,non_hydro_renewables
+GRC,Greece,51.126217,-0.7628858,-0.4496634,hydro
+GRD,Grenada,0.13902764,-8.099472,7.8247905,hydro
+GRL,Greenland,0.02700745,534.7071,522.95264,non_hydro_renewables
+GTM,Guatemala,33.8583,1.6064048,-1.4303684,non_hydro_renewables
+GUM,Guam,0.008813158,-36.334324,-34.21331,hydro
+GUY,Guyana,3.985452,-1.8172681,3.2922864,hydro
+HKG,"Hong Kong SAR, China",56.970284,-7.271862,-13.775629,non_hydro_renewables
+HND,Honduras,11.554448,-0.37620664,1.9549966,hydro
+HRV,Croatia,21.231567,0.19539595,-1.7187774,non_hydro_renewables
+HTI,Haiti,5.0258036,4.554367,4.8686504,hydro
+HUN,Hungary,64.2738,7.0331097,1.5709162,non_hydro_renewables
+IDN,Indonesia,1500.1746,0.28514862,0.45894384,hydro
+IND,India,3967.1062,7.533884,-0.41467547,non_hydro_renewables
+IRL,Ireland,40.21479,0.3263116,-1.2425065,non_hydro_renewables
+IRN,"Iran, Islamic Rep.",504.27582,1.6455412,3.2558322,hydro
+IRQ,Iraq,182.83047,1.8141866,1.602304,non_hydro_renewables
+ISL,Iceland,2.6263373,-2.0954967,-1.0623038,hydro
+ISR,Israel,78.61905,2.8874874,2.7224183,non_hydro_renewables
+ITA,Italy,254.71707,8.530796,4.7329307,non_hydro_renewables
+JAM,Jamaica,7.790271,0.6708503,0.4261732,non_hydro_renewables
+JOR,Jordan,31.865732,-2.7980626,-2.7980626,non_hydro_renewables
+JPN,Japan,834.37756,0.97938776,0.0,non_hydro_renewables
+KAZ,Kazakhstan,206.34268,3.9209604,0.1173377,non_hydro_renewables
+KEN,Kenya,44.148205,-6.101775,-6.8823633,non_hydro_renewables
+KGZ,Kyrgyz Republic,14.632276,1.4424086,-0.41266084,non_hydro_renewables
+KHM,Cambodia,11.500206,3.949678,-7.7218237,non_hydro_renewables
+KIR,Kiribati,0.050998777,5.664432,23.99416,hydro
+KNA,St. Kitts and Nevis,0.019618008,237.58817,356.52737,hydro
+KOR,"Korea, Rep.",627.5239,-3.9133787,-7.1002903,non_hydro_renewables
+KWT,Kuwait,99.989494,-8.820218,-1.6077816,hydro
+LAO,Lao PDR,7.1544647,56.409027,53.431366,non_hydro_renewables
+LBN,Lebanon,12.4351845,-6.307417,-1.1166453,hydro
+LBR,Liberia,1.0415425,81.02343,73.97356,non_hydro_renewables
+LBY,Libya,26.307404,-1.3884723,-4.9386144,non_hydro_renewables
+LCA,St. Lucia,0.6259008,-24.593513,-16.584307,hydro
+LKA,Sri Lanka,18.65493,-0.5249202,1.9509554,hydro
+LSO,Lesotho,1.7702465,3.3997536,-22.04193,non_hydro_renewables
+LTU,Lithuania,15.183398,-4.93229,1.6904473,hydro
+LUX,Luxembourg,9.876019,-13.032711,-17.15728,non_hydro_renewables
+LVA,Latvia,9.812387,6.2835217,4.94442,non_hydro_renewables
+MAC,"Macao SAR, China",4.271366,-0.3174603,1.248014,hydro
+MAR,Morocco,214.57092,-6.7961097,-7.2313547,non_hydro_renewables
+MDA,Moldova,5.7276354,3.2745838,-1.329565,non_hydro_renewables
+MDG,Madagascar,4.329388,8.17039,8.17039,non_hydro_renewables
+MDV,Maldives,5.251878,-6.1369715,-2.1026015,hydro
+MEX,Mexico,803.87714,1.2634754,1.2634754,non_hydro_renewables
+MKD,North Macedonia,8.45614,3.8613558,0.31850338,non_hydro_renewables
+MLI,Mali,5.6112833,61.520756,60.71353,non_hydro_renewables
+MMR,Myanmar,60.150185,-15.764147,-10.160565,hydro
+MNG,Mongolia,28.267248,9.786201,-0.029182434,non_hydro_renewables
+MOZ,Mozambique,7.680046,1.0259151,-0.10019541,non_hydro_renewables
+MRT,Mauritania,7.441228,1.2583017,-2.6051164,non_hydro_renewables
+MUS,Mauritius,6.7674217,3.7190437,-1.760292,non_hydro_renewables
+MWI,Malawi,5.2939234,46.11136,48.65928,hydro
+MYS,Malaysia,276.12042,1.1071682,-0.5106151,non_hydro_renewables
+NAM,Namibia,4.682564,7.6411843,3.5244584,non_hydro_renewables
+NCL,New Caledonia,1.9405655,-1.32339,4.047966,hydro
+NER,Niger,3.3268666,81.66231,5.5202007,non_hydro_renewables
+NGA,Nigeria,129.35472,4.523289,-0.7390857,non_hydro_renewables
+NIC,Nicaragua,6.356819,6.252098,4.592955,non_hydro_renewables
+NLD,Netherlands,212.68289,-1.3231754,-0.61880946,hydro
+NOR,Norway,43.604088,-7.125914,-8.54271,non_hydro_renewables
+NPL,Nepal,14.06559,-0.26444197,-4.398841,non_hydro_renewables
+NZL,New Zealand,37.29124,4.535496,0.0,non_hydro_renewables
+PAK,Pakistan,462.00116,-10.724759,-10.975581,non_hydro_renewables
+PAN,Panama,18.248951,1.7999768,-0.007545948,non_hydro_renewables
+PER,Peru,78.83779,1.1774898,-2.751273,non_hydro_renewables
+PHL,Philippines,218.51363,0.37882328,0.34122467,non_hydro_renewables
+PNG,Papua New Guinea,10.400858,-22.851599,-26.051176,non_hydro_renewables
+POL,Poland,269.4264,-1.8894374,-2.1144211,non_hydro_renewables
+PRI,Puerto Rico (US),31.648767,-44.85534,-37.914528,hydro
+PRT,Portugal,34.75533,11.234772,10.784006,non_hydro_renewables
+PRY,Paraguay,8.909784,14.987194,1.3571501,non_hydro_renewables
+PYF,French Polynesia,1.4358376,-5.690855,-6.131327,non_hydro_renewables
+ROU,Romania,102.66426,1.3499975,-0.7699251,non_hydro_renewables
+RUS,Russian Federation,1625.2677,2.0397544,1.7066121,non_hydro_renewables
+RWA,Rwanda,5.2158127,-9.196842,-4.5909824,hydro
+SDN,Sudan,14.455002,2.7246594,-1.0122716,non_hydro_renewables
+SEN,Senegal,11.600794,10.449875,1.57094,non_hydro_renewables
+SGP,Singapore,54.71631,-1.1504114,-0.5448699,hydro
+SLB,Solomon Islands,0.531295,9.56558,9.854245,hydro
+SLE,Sierra Leone,2.8486483,36.518288,41.044365,hydro
+SLV,El Salvador,9.3919525,1.2840867,-0.17037392,non_hydro_renewables
+SOM,Somalia,1.2056183,27.437174,-9.692913,non_hydro_renewables
+STP,Sao Tome and Principe,0.06610565,13.2849455,13.067329,non_hydro_renewables
+SUR,Suriname,2.6178908,-0.73226094,-0.65019727,hydro
+SVK,Slovak Republic,41.142735,-1.8872857,-1.7770708,hydro
+SVN,Slovenia,16.398842,-0.14823675,-0.572294,non_hydro_renewables
+SWE,Sweden,45.713455,9.007252,5.468333,non_hydro_renewables
+SWZ,Eswatini,1.1649545,-8.849734,-13.619572,non_hydro_renewables
+SYC,Seychelles,0.17097366,-4.237157,7.2579265,hydro
+SYR,Syrian Arab Republic,54.138874,0.44887066,-0.3403008,non_hydro_renewables
+TCA,Turks and Caicos Islands,0.03147789,22.505999,1.7596245,non_hydro_renewables
+TCD,Chad,4.8293715,16.276814,-9.49834,non_hydro_renewables
+TGO,Togo,3.324501,3.4900308,-0.42236447,non_hydro_renewables
+THA,Thailand,298.9624,0.95841885,-2.033776,non_hydro_renewables
+TJK,Tajikistan,7.3255982,4.7178984,-10.132986,non_hydro_renewables
+TLS,Timor-Leste,1.7085187,-12.990755,-0.35207868,hydro
+TON,Tonga,0.24497978,-20.585936,27.381443,hydro
+TTO,Trinidad and Tobago,31.42103,-6.3331604,1.8412948,hydro
+TUN,Tunisia,31.702494,1.387012,1.250267,non_hydro_renewables
+TUR,Turkiye,410.93115,4.804158,-2.331853,non_hydro_renewables
+TZA,Tanzania,28.205194,-4.548013,-5.516708,non_hydro_renewables
+UGA,Uganda,7.2462587,15.698755,11.07235,non_hydro_renewables
+UKR,Ukraine,157.36713,0.6157398,0.6157398,non_hydro_renewables
+URY,Uruguay,8.745249,0.96230507,1.0128617,hydro
+USA,United States,4571.96,1.5706182,1.4423251,non_hydro_renewables
+UZB,Uzbekistan,152.55466,19.501245,19.123602,non_hydro_renewables
+VCT,St. Vincent and the Grenadines,0.2731663,-10.394711,-18.487078,non_hydro_renewables
+VEN,"Venezuela, RB",126.970116,3.7102342,2.5337577,non_hydro_renewables
+VIR,Virgin Islands (U.S.),0.0046390584,-24.935246,-26.709806,non_hydro_renewables
+VNM,Viet Nam,326.97174,2.3468256,2.251184,non_hydro_renewables
+VUT,Vanuatu,0.26598606,-13.3297205,-11.30355,hydro
+WSM,Samoa,0.25029954,9.702766,-1.1780202,non_hydro_renewables
+YEM,"Yemen, Rep.",17.273281,26.434076,-0.7863283,non_hydro_renewables
+ZAF,South Africa,508.0001,-2.4166048,-2.1701634,hydro
+ZMB,Zambia,11.173308,-5.4792643,-9.255624,non_hydro_renewables
+ZWE,Zimbabwe,11.666107,-4.6312037,-4.7216835,non_hydro_renewables

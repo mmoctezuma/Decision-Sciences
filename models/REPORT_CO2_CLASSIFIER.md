@@ -60,7 +60,7 @@ We evaluate with multiple **time splits** (e.g., 2000, 2005, 2010): train up to 
     - Share labeled **likely_reduce_CO2 = 1**: **22.5%**
 
     **Top 10 strongest projected reducers** (most negative `delta` in mean ln(CO₂)`):
-    | iso3c   |     delta |
+| iso3c   |     delta |
 |:--------|----------:|
 | SYC     | -1.85439  |
 | GRL     | -1.67838  |
@@ -74,7 +74,7 @@ We evaluate with multiple **time splits** (e.g., 2000, 2005, 2010): train up to 
 | BGR     | -0.428883 |
 
     **Top 10 projected increasers** (most positive `delta`):
-    | iso3c   |   delta |
+| iso3c   |   delta |
 |:--------|--------:|
 | GUM     | 3.7018  |
 | VIR     | 3.2261  |

@@ -18,71 +18,20 @@ Salidas:
 
 import argparse
 import os
+import logging
 from typing import List, Tuple
 
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 
-from models.co2_models import load_panel, build_features, fit_xgb 
+from models.helpers import load_panel, build_features, extended_data
+from models.co2_models import fit_xgb 
+
+logger = logging.getLogger(__name__)
 
 
-# --------------------- Utilidades de proyección (CAGR) --------------------- #
-def compute_cagr(series: pd.Series) -> float | None:
-    valid = series.dropna()
-    if len(valid) < 2:
-        return None
-    valid = valid.sort_index()
-    start, end = valid.iloc[0], valid.iloc[-1]
-    years = len(valid) - 1
-    if start > 0 and end > 0 and years > 0:
-        return (end / start) ** (1 / years) - 1
-    return np.nan
-
-
-def project_series(series: pd.Series, years: int = 5) -> pd.Series:
-    """Proyecta por CAGR desde el último dato hacia adelante."""
-    g = compute_cagr(series)
-    idx_end = series.index[-1]
-    if g is None or not np.isfinite(g):
-        return pd.Series([np.nan] * years, index=range(idx_end + 1, idx_end + years + 1))
-    base = series.iloc[-1]
-    vals = [base * ((1 + g) ** i) for i in range(1, years + 1)]
-    return pd.Series(vals, index=range(idx_end + 1, idx_end + years + 1))
-
-
-def extend_country(df_country: pd.DataFrame, years: int = 5) -> pd.DataFrame | None:
-    """Proyecta todas las columnas numéricas de un país a futuro (CAGR, 5 años)."""
-    results = []
-    df_country = df_country.sort_values("year")
-    for col in df_country.columns:
-        if col in ["iso3c", "Country", "year", "region"]:
-            continue
-        s = df_country.set_index("year")[col].dropna()
-        if len(s) > 1:
-            proj = project_series(s, years)
-            proj.name = col
-            results.append(proj)
-    if not results:
-        return None
-    df_proj = pd.concat(results, axis=1).reset_index().rename(columns={"index": "year"})
-    df_proj["iso3c"] = df_country["iso3c"].iloc[0]
-    df_proj["Country"] = df_country["Country"].iloc[0]
-    if "region" in df_country.columns:
-        df_proj["region"] = df_country["region"].iloc[0]
-    return df_proj
-
-
-def extended_data(df: pd.DataFrame, years: int = 5) -> pd.DataFrame:
-    """Wrapper: aplica extend_country a todos los países y concatena."""
-    out = []
-    for iso, g in df.groupby("iso3c"):
-        res = extend_country(g, years=years)
-        if res is not None and not res.empty:
-            out.append(res)
-    if not out:
-        return pd.DataFrame()
-    return pd.concat(out, ignore_index=True)
+"""Projection helpers moved to models.helpers"""
 
 
 # --------------------- Limpieza y manejo del mix eléctrico --------------------- #
@@ -205,8 +154,8 @@ def run_scenario(
 
     # 1) Cargar panel + limpieza global del mix
     df = load_panel(panel_csv)
-    print("[INFO] df shape:", df.shape, "years:", df["year"].min(), "→", df["year"].max(),
-          "countries:", df["iso3c"].nunique())
+    logger.info("df shape=%s years=%s→%s countries=%s",
+                df.shape, df["year"].min(), df["year"].max(), df["iso3c"].nunique())
     df = clean_mix(df)
 
     # 2) Validaciones de columnas y cobertura
@@ -217,12 +166,12 @@ def run_scenario(
 
     controls = [c for c in controls if c in df.columns]
     if not controls:
-        print("[WARN] Sin controles disponibles; se entrenará con ln_GDP solamente.")
+        logger.warning("Sin controles disponibles; se entrenará con ln_GDP solamente.")
     else:
         cover = df[controls].notna().mean().sort_values(ascending=False)
         use70 = [c for c in cover.index if cover[c] >= 0.70]
         controls = use70 if use70 else [c for c in cover.index if cover[c] >= 0.50]
-        print("[INFO] Controles usados:", controls)
+        logger.info("Controles usados: %s", controls)
 
     # 3) Features completas e info entrenable
     X_full, ln_controls = build_features(
@@ -231,11 +180,11 @@ def run_scenario(
         gdp="NY.GDP.MKTP.CD",
         controls=controls
     )
-    print("[INFO] X_full shape:", X_full.shape)
-    print("[INFO] ln_controls:", ln_controls)
+    logger.info("X_full shape: %s", X_full.shape)
+    logger.info("ln_controls: %s", ln_controls)
     train_cols = ["ln_CO2", "ln_GDP"] + [c for c in ln_controls if c in X_full.columns]
     rows_ok = X_full[train_cols].dropna().shape[0]
-    print("[INFO] Filas entrenables:", rows_ok)
+    logger.info("Filas entrenables: %s", rows_ok)
     if rows_ok == 0:
         raise RuntimeError("[FATAL] X_full quedó vacío tras build_features. Revisa controles/NaNs/valores <=0.")
 
@@ -244,11 +193,11 @@ def run_scenario(
         if col not in X_full.columns:
             raise RuntimeError(f"[FATAL] Falta columna {col} en X_full.")
     bst, features = fit_xgb(X_full, controls=controls)
-    print("[INFO] Modelo XGB entrenado. n_features:", len(features), "features:", features)
+    logger.info("Modelo XGB entrenado. n_features=%s features=%s", len(features), features)
 
     # 5) Proyección base (CAGR) y features futuras BASE
     fut_base = extended_data(df, years=years)
-    print("[INFO] Futuro baseline filas:", fut_base.shape)
+    logger.info("Futuro baseline filas: %s", fut_base.shape)
     if fut_base.empty:
         raise RuntimeError("[FATAL] No se pudo extender el panel; verifica que cada país tenga ≥2 años válidos.")
 
@@ -262,7 +211,7 @@ def run_scenario(
     )
     max_hist = int(df["year"].max())
     mask_base = X_base["year"] > max_hist
-    print("[INFO] Filas futuras en X_base:", int(mask_base.sum()))
+    logger.info("Filas futuras en X_base: %s", int(mask_base.sum()))
 
     # 6) Escenario de inversión y features futuras SCENARIO
     inc_mix = increase_share(df, invest_target, inc_pp_total=renew_pp_total, years=years)
@@ -286,12 +235,12 @@ def run_scenario(
         controls=controls
     )
     mask_scen = X_scen["year"] > max_hist
-    print("[INFO] Filas futuras en X_scen:", int(mask_scen.sum()))
+    logger.info("Filas futuras en X_scen: %s", int(mask_scen.sum()))
 
     # 7) Predicciones futuras base vs escenario
     Xb = X_base.loc[mask_base, features]
     Xs = X_scen.loc[mask_scen, features]
-    print("[INFO] Xb.shape:", Xb.shape, "Xs.shape:", Xs.shape)
+    logger.info("Xb.shape=%s Xs.shape=%s", Xb.shape, Xs.shape)
     if Xb.empty or Xs.empty:
         raise RuntimeError("[FATAL] Matrices futuras vacías (baseline o escenario). Revisa proyección/mezcla/merge.")
 
@@ -393,10 +342,7 @@ def run_scenario(
     })
     global_summary.to_csv(out3, index=False)
 
-    print("[INFO] Outputs:")
-    print("  -", out1)
-    print("  -", out2)
-    print("  -", out3)
+    logger.info("Outputs saved: %s | %s | %s", out1, out2, out3)
 
     return res_out, prio_out, global_summary
 
@@ -420,6 +366,7 @@ def parse_args():
 
 
 def main():
+    logging.basicConfig(level=logging.INFO)
     args = parse_args()
     run_scenario(
         panel_csv=args.input_file,
@@ -429,9 +376,8 @@ def main():
         invest_target=args.invest_target,
         controls=args.controls
     )
-    print("Done.")
+    logger.info("Done.")
 
 
 if __name__ == "__main__":
     main()
-

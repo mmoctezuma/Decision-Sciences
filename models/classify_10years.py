@@ -1,67 +1,16 @@
 # -*- coding: utf-8 -*-
 import argparse
+import logging
 import pandas as pd
 import numpy as np
 import xgboost as xgb
-from models.co2_models import load_panel, build_features, fit_xgb
+from models.helpers import load_panel, build_features, extended_data
+from models.co2_models import fit_xgb
+
+logger = logging.getLogger(__name__)
 
 
-# =========================
-#  FUNCIONES AUXILIARES
-# =========================
-def compute_cagr(series):
-    valid = series.dropna()
-    if len(valid) < 2:
-        return None
-    valid = valid.sort_index()
-    start, end = valid.iloc[0], valid.iloc[-1]
-    years = len(valid) - 1
-    if start > 0 and end > 0 and years > 0:
-        return (end/start)**(1/years) - 1 
-    else:
-        return np.nan
-
-
-def project_series(series, years=10):
-    g = compute_cagr(series)
-    if g is None or not np.isfinite(g):
-        return pd.Series([np.nan]*years,
-                         index=range(series.index[-1]+1, series.index[-1]+years+1))
-    projections = [series.iloc[-1] * ((1+g)**i) for i in range(1, years+1)]
-    return pd.Series(projections,
-                     index=range(series.index[-1]+1, series.index[-1]+years+1))
-
-
-def extend_country(df_country, years=10):
-    df_country = df_country.sort_values("year")
-    results = []
-    for col in df_country.columns:
-        if col in ["iso3c", "Country", "year", "region"]:
-            continue
-        series = df_country.set_index("year")[col].dropna()
-        if len(series) > 1:
-            proj = project_series(series, years)
-            proj.name = col
-            results.append(proj)
-    if not results:
-        return None
-    df_proj = pd.concat(results, axis=1).reset_index().rename(columns={"index": "year"})
-    df_proj["iso3c"] = df_country["iso3c"].iloc[0]
-    df_proj["Country"] = df_country["Country"].iloc[0]
-    if "region" in df_country.columns:
-        df_proj["region"] = df_country["region"].iloc[0]
-    return df_proj
-
-
-def extended_data(df, years=10):
-    extended_rows = []
-    for iso, group in df.groupby("iso3c"):
-        res = extend_country(group, years=years)
-        if res is not None and not res.empty:
-            extended_rows.append(res)
-    if not extended_rows:
-        return pd.DataFrame()
-    return pd.concat(extended_rows, ignore_index=True)
+"""Projection helpers moved to models.helpers"""
 
 # =========================
 #  MAIN
@@ -99,7 +48,7 @@ def main(input_file, output_file_compare, output_file_df, target, gdp, controls,
     compare["likely_reduce_CO2"] = compare["delta"].apply(lambda x: 1 if x < 0 else 0)
     
     compare.to_csv(output_file_compare, index=False)
-    print(f"Resultados guardados en {output_file_compare}")
+    logger.info("Resultados guardados en %s", output_file_compare)
     
     iso_likely = dict(zip(compare["iso3c"], compare["likely_reduce_CO2"]))
     df['likely_reduce_CO2'] = df['iso3c'].map(iso_likely)
@@ -110,6 +59,7 @@ def main(input_file, output_file_compare, output_file_df, target, gdp, controls,
 #  ENTRYPOINT CLI
 # =========================
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description="Clasifica si los países subirán o bajarán CO2 en 10 años")
     parser.add_argument("--input_file", default="data/processed/wide_clean.csv", help="Archivo de entrada (panel wide)")
     parser.add_argument("--output_file_compare", default="model_results/10years/compare_10years.csv", help="Archivo CSV de salida para comparacion")
@@ -121,4 +71,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(args.input_file, args.output_file_compare, args.output_file_df, args.target, args.gdp, args.controls, args.years)
-

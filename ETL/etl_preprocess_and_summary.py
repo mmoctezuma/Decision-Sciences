@@ -2,9 +2,13 @@
 
 import argparse
 import os
+import logging
 import pandas as pd
 import numpy as np
 from scipy.stats.mstats import winsorize
+from models.helpers import compute_cagr, project_series
+
+logger = logging.getLogger(__name__)
 
 
 # =========================
@@ -203,28 +207,7 @@ def _interp_no_extrap(series: pd.Series, kind="linear"):
     return pd.Series(out, index=series.index)
 
 
-def compute_cagr(series):
-    valid = series.dropna()
-    if len(valid) < 2:
-        return None
-    valid = valid.sort_index()
-    start, end = valid.iloc[0], valid.iloc[-1]
-    years = len(valid) - 1
-    if start > 0 and end > 0 and years > 0:
-        return (end/start)**(1/years) - 1 
-    else:
-        return np.nan
-
-
-def extrap_series(series, years=10):
-    g = compute_cagr(series)
-    if g is None:
-        return pd.Series([np.nan]*years, 
-                         index=range(series.index[-1]+1, series.index[-1]+years+1))
-    
-    projections = [series.iloc[-1] * ((1+g)**i) for i in range(1, years+1)]
-    return pd.Series(projections, 
-                     index=range(series.index[-1]+1, series.index[-1]+years+1))
+"""Projection helpers moved to models.helpers (compute_cagr, project_series)."""
 
 
 def _clamp(s: pd.Series, lo, hi):
@@ -286,7 +269,7 @@ def preprocess_with_policy(
                     if last_valid is not None and last_valid < tmp_interp.index.max():
                         missing_years = tmp_interp.index[(tmp_interp.index > last_valid) & (tmp_interp.isna())]
                         if len(missing_years) > 0:
-                            proj = extrap_series(tmp_interp.loc[:last_valid], years=len(missing_years))
+                            proj = project_series(tmp_interp.loc[:last_valid], years=len(missing_years))
                             for y in missing_years:
                                 if y in proj.index:
                                     tmp_interp.loc[y] = proj.loc[y]
@@ -470,8 +453,8 @@ def main():
         summarize_after_preprocess(wide_clean, os.path.join(args.workdir, "summary_after"), args.focus_year)
         compute_country_coverage_by_series(wide, args.workdir, min_years=11)
 
-    print("ETL finalizado.")
+    logger.info("ETL finalizado.")
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
-

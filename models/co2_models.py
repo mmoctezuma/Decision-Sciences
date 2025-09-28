@@ -19,6 +19,7 @@ Ejemplo:
 
 import os
 import argparse
+import logging
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
@@ -31,48 +32,11 @@ try:
 except Exception:
     PanelOLS = None
 
+from models.helpers import load_panel, build_features, ensure_dir
 
-def _ensure_dir(p: str):
-    os.makedirs(p, exist_ok=True)
+logger = logging.getLogger(__name__)
 
-
-def load_panel(workdir: str) -> pd.DataFrame:
-    df = pd.read_csv(workdir)
-    df = df.dropna(subset=["iso3c", "year"])
-    df["year"] = df["year"].astype(int)
-    return df
-
-
-def build_features(
-    df: pd.DataFrame,
-    target: str = "EN.GHG.CO2.MT.CE.AR5",
-    gdp: str = "NY.GDP.MKTP.CD",
-    controls: list | None = None,
-) -> tuple[pd.DataFrame, list]:
-    """Crea ln_CO2, ln_GDP y ln_controles; filtra filas con NaN en esas columnas."""
-    if controls is None:
-        controls = ["SP.POP.TOTL", "SP.URB.TOTL.IN.ZS", "EN.GHG.CO2.LU.MT.CE.AR5"]
-
-    keep = ["iso3c", "Country", "year", target, gdp] + [c for c in controls if c in df.columns]
-    X = df.loc[:, [c for c in keep if c in df.columns]].copy()
-
-    def _safe_log(s: pd.Series, eps=1e-9):
-        s = pd.to_numeric(s, errors="coerce")
-        min_pos = s[s > 0].min()
-        floor = float(min_pos) if pd.notna(min_pos) else eps
-        return np.log(s.clip(lower=floor))
-
-    X["ln_CO2"] = _safe_log(X[target])
-    X["ln_GDP"] = _safe_log(X[gdp])
-
-    ln_controls = []
-    for c in controls:
-        if c in X.columns:
-            X[f"ln_{c}"] = _safe_log(X[c])
-            ln_controls.append(f"ln_{c}")
-
-    X = X.dropna(subset=["ln_CO2", "ln_GDP"] + ln_controls)
-    return X, ln_controls
+"""Common helpers imported from models.helpers"""
 
 
 # ====================================================
@@ -157,7 +121,7 @@ def main():
     parser.add_argument("--split_year", type=int, default=None, help="Último año para train (resto = test)")
     args = parser.parse_args()
 
-    _ensure_dir(args.output_dir)
+    ensure_dir(args.output_dir)
 
     df = load_panel(args.input_file)
     X, ln_controls = build_features(df, target=args.target, gdp=args.gdp, controls=args.controls)
@@ -178,7 +142,7 @@ def main():
         fe_path = os.path.join(args.output_dir, "model_fe.pkl")
         with open(fe_path, "wb") as f:
             pickle.dump(res, f)
-        print(f"[FE] Modelo guardado en {fe_path}")
+        logger.info("[FE] Modelo guardado en %s", fe_path)
         
         Xp_train = train.set_index(["iso3c", "year"]).sort_index()[res.model.exog.vars]
         yhat_train = res.predict(Xp_train)
@@ -202,17 +166,17 @@ def main():
             all_pred["CO2_pred"] = np.exp(all_pred["ln_CO2_hat"])
             
             all_pred.to_csv(os.path.join(args.output_dir, "predictions_fe.csv"), index=False)
-            print("[FE] Predicciones baseline guardadas")
+            logger.info("[FE] Predicciones baseline guardadas")
         else:
-            print(f"[FE] β(ln GDP → ln CO2) = {beta:.3f}")
-            print(f"➡ {args.shock_pct}% más PIB ⇒ cambio esperado ≈ {beta * args.shock_pct:.2f}%")
+            logger.info("[FE] β(ln GDP → ln CO2) = %.3f", beta)
+            logger.info("%s%% más PIB ⇒ cambio esperado ≈ %.2f%%", args.shock_pct, beta * args.shock_pct)
 
     else:  # XGB
         bst, features = fit_xgb(train, controls=args.controls)
         
         xgb_path = os.path.join(args.output_dir, "model_xgb.json")
         bst.save_model(xgb_path)
-        print(f"[XGB] Modelo guardado en {xgb_path}")
+        logger.info("[XGB] Modelo guardado en %s", xgb_path)
 
         yhat_train = bst.predict(xgb.DMatrix(train[features]))
         metrics_train = compute_metrics(train["ln_CO2"], yhat_train, "_train")
@@ -230,13 +194,13 @@ def main():
             y_pred = bst.predict(xgb.DMatrix(X[features]))
             X_out["CO2_pred"] = np.exp(y_pred)
             X_out.to_csv(os.path.join(args.output_dir, "predictions_xgb.csv"), index=False)
-            print("[XGB] Predicciones baseline guardadas")
+            logger.info("[XGB] Predicciones baseline guardadas")
         else:
             scen = simulate_gdp_shock_xgb(bst, features, X, shock_pct=args.shock_pct)
             scen.to_csv(os.path.join(args.output_dir, f"scenario_xgb_{int(args.shock_pct)}pct.csv"), index=False)
-            print(f"[XGB] Escenario +{args.shock_pct}% PIB generado")
+            logger.info("[XGB] Escenario +%s%% PIB generado", args.shock_pct)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
-

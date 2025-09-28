@@ -22,6 +22,7 @@ Salidas (en <output_dir>/fe/):
 
 import os
 import argparse
+import logging
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_squared_error, mean_absolute_error
@@ -33,48 +34,11 @@ try:
 except Exception:
     _USING_LM = False
 
+from models.helpers import load_panel, build_features, ensure_dir
 
-def _ensure_dir(p: str):
-    os.makedirs(p, exist_ok=True)
+logger = logging.getLogger(__name__)
 
-
-def load_panel(workdir: str) -> pd.DataFrame:
-    df = pd.read_csv(workdir)
-    df = df.dropna(subset=["iso3c", "year"])
-    df["year"] = df["year"].astype(int)
-    return df
-
-
-def build_features(
-    df: pd.DataFrame,
-    target: str = "EN.GHG.CO2.MT.CE.AR5",
-    gdp: str = "NY.GDP.MKTP.CD",
-    controls: list | None = None,
-) -> tuple[pd.DataFrame, list]:
-    """Crea ln_CO2, ln_GDP y ln_controles; filtra filas con NaN en esas columnas."""
-    if controls is None:
-        controls = ["SP.POP.TOTL", "SP.URB.TOTL.IN.ZS", "EN.GHG.CO2.LU.MT.CE.AR5"]
-
-    keep = ["iso3c", "Country", "year", target, gdp] + [c for c in controls if c in df.columns]
-    X = df.loc[:, [c for c in keep if c in df.columns]].copy()
-
-    def _safe_log(s: pd.Series, eps=1e-9):
-        s = pd.to_numeric(s, errors="coerce")
-        min_pos = s[s > 0].min()
-        floor = float(min_pos) if pd.notna(min_pos) else eps
-        return np.log(s.clip(lower=floor))
-
-    X["ln_CO2"] = _safe_log(X[target])
-    X["ln_GDP"] = _safe_log(X[gdp])
-
-    ln_controls = []
-    for c in controls:
-        if c in X.columns:
-            X[f"ln_{c}"] = _safe_log(X[c])
-            ln_controls.append(f"ln_{c}")
-
-    X = X.dropna(subset=["ln_CO2", "ln_GDP"] + ln_controls)
-    return X, ln_controls
+"""Common helpers imported from models.helpers"""
 
 
 def fit_panel_fe(
@@ -234,14 +198,14 @@ def main():
     args = parser.parse_args()
 
     out_dir = args.output_dir
-    _ensure_dir(os.path.join(out_dir, 'fe'))
+    ensure_dir(os.path.join(out_dir, 'fe'))
 
     df = load_panel(args.input_file)
     if args.country:
         df = df[df["iso3c"] == args.country]
         if df.empty:
             raise ValueError(f"No hay datos para {args.country}")
-        print(f"📌 Entrenando solo para {args.country}")
+        logger.info("Entrenando solo para %s", args.country)
 
     X, ln_controls = build_features(df, target=args.target, gdp=args.gdp, controls=args.controls)
 
@@ -280,12 +244,12 @@ def main():
     )
     scen.to_csv(os.path.join(out_dir, f"scenario_gdp_plus{int(args.shock_pct)}pct{suffix}.csv"), index=False)
 
-    print(f"Modelo FE listo. β(ln GDP → ln CO2) = {beta:.3f}")
-    print(f"➡ Un {args.shock_pct:.1f}% más de PIB ⇒ CO₂ ≈ {elastic['expected_change_co2_pct_exact'].iat[0]:.2f}% (exacto)")
+    logger.info("Modelo FE listo. β(ln GDP → ln CO2) = %.3f", beta)
+    logger.info("Un %.1f%% más de PIB ⇒ CO₂ ≈ %.2f%% (exacto)", args.shock_pct, elastic['expected_change_co2_pct_exact'].iat[0])
     if single_country:
-        print(f"País: {iso3c_code}")
+        logger.info("País: %s", iso3c_code)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     main()
-

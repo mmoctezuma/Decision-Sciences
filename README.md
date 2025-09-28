@@ -7,6 +7,7 @@ Includes:
 - Econometric (Fixed Effects) and ML (XGBoost) models.
 - Binary classification of 10-year CO₂ changes.
 - EV adoption scenario (EV50) analysis.
+ - Renewables investment scenario (5-year) analysis.
 - Organized folders with results, metrics, predictions, and reports.
 
 ---
@@ -51,9 +52,11 @@ pip install -e .
 │   ├── co2_classifier.py                 # Classifier (Logit + XGB) on target binary column
 │   ├── fe_log_log_model.py               # Alternative FE log–log pipeline (+ per-country option)
 │   ├── ev50_scenario.py                  # EV50 scenario (50% EV adoption) impact analysis
+│   ├── renew_invest_scenario.py          # Renewables investment 5-year scenario + prioritization
 │   ├── positive_and_shap_tables.py       # Utilities: positive-class table, regional share, SHAP table
 │   ├── REPORT_CO2_MODELS.md              # Extended model report (FE/XGB)
 │   └── REPORT_CO2_CLASSIFIER.md          # Classifier methodology and insights
+│   └── REPORT_RENEW_SCENARIO.md          # Renewables scenario methodology and usage
 │
 ├── data/
 │   ├── raw_data/                         # Raw World Bank downloads
@@ -114,7 +117,7 @@ python models/positive_and_shap_tables.py \
 
 You can run the ETL script in different modes depending on your needs:
 
-#### 🔹 Case 1: Only generate a summary of the raw data  
+#### Case 1: Only generate a summary of the raw data  
 ```bash
 python ETL/etl_preprocess_and_summary.py \
   --input data/raw_data/wb_co2_and_indicators.csv \
@@ -122,7 +125,7 @@ python ETL/etl_preprocess_and_summary.py \
   --stage summarize
 ```
 
-#### 🔹 Case 2: Preprocess data with winsorization and recommendations  
+#### Case 2: Preprocess data with winsorization and recommendations  
 ```bash
 python ETL/etl_preprocess_and_summary.py \
   --input data/raw_data/wb_co2_and_indicators.csv \
@@ -133,7 +136,7 @@ python ETL/etl_preprocess_and_summary.py \
   --winsor --winsor_limits 0.01 0.01
 ```
 
-#### 🔹 Case 3: Full pipeline with a focus year  
+#### Case 3: Full pipeline with a focus year  
 ```bash
 python ETL/etl_preprocess_and_summary.py \
   --input data/raw_data/wb_co2_and_indicators.csv \
@@ -190,7 +193,30 @@ python models/ev50_scenario.py \
 Outputs in `model_results/ev50/`:
 - `ev50_results.csv`, `ev50_results_capped.csv`, `ev50_sensitivity_capped.csv`, `ev50_top_abs.csv`, `ev50_top_pct.csv`
 
-### 5. 10-year classification
+### 5. Renewables investment (5-year scenario)
+
+Simulate a planned increase in the electricity mix share for renewables or hydro over 5 years, compare against a baseline projection, and produce country-level prioritization.
+
+```bash
+python models/renew_invest_scenario.py \
+  --input_file data/processed/wide_clean.csv \
+  --output_dir model_results/renew \
+  --years 5 \
+  --renew_pp_total 10.0 \
+  --invest_target EG.ELC.RNEW.ZS \
+  --controls SP.POP.TOTL SP.URB.TOTL.IN.ZS EG.FEC.RNEW.ZS \
+            EG.ELC.COAL.ZS EG.ELC.NGAS.ZS EG.ELC.PETR.ZS \
+            EG.ELC.NUCL.ZS EG.ELC.HYRO.ZS EG.ELC.RNEW.ZS
+```
+
+Outputs in `model_results/renew/`:
+- `renew_5y_country_results.csv` — Baseline vs scenario CO₂, reduction%, probability.
+- `renew_5y_priorities.csv` — Country-level tech prioritization (hydro vs non-hydro renewables).
+- `renew_5y_global_summary.csv` — Global summary and scenario parameters.
+
+Details: see `models/REPORT_RENEW_SCENARIO.md`.
+
+### 6. 10-year classification
 
 ```bash
 python -m models.classify_10years \
@@ -202,7 +228,7 @@ python -m models.classify_10years \
   --controls SP.POP.TOTL SP.URB.TOTL.IN.ZS EG.USE.PCAP.KG.OE
 ```
 
-### 6. Final classifier (Logit + XGB)
+### 7. Final classifier (Logit + XGB)
 
 ```bash
 python models/co2_classifier.py \
@@ -213,14 +239,42 @@ python models/co2_classifier.py \
 
 ---
 
-## Expected results
+## Models & Results (generated artifacts)
 
-- Metrics: `model_results/metrics_fe.csv`, `model_results/metrics_xgb.csv` (and `model_results/fe/metrics.csv` in the alt FE pipeline).
-- Predictions (if `--predict`): `model_results/predictions_fe.csv`, `model_results/predictions_xgb.csv` (or `model_results/fe/predictions_full.csv`).
-- XGB scenario: `model_results/scenario_xgb_10pct.csv`.
-- 10-year comparison: `model_results/compare_10years.csv`.
-- Classifier artifacts: `model_results/classifier/metrics_classifier.csv`, `logit_model.pkl`, `xgb_classifier_model.json`.
-- EV50 scenario outputs: `model_results/ev50/ev50_results*.csv`, `ev50_top_abs.csv`, `ev50_top_pct.csv`.
+The following artifacts are produced in `model_results/` by the ETL, modeling, classification, and scenario scripts. Paths are relative to the repository root.
+
+Top-level outputs
+- `model_results/metrics_fe.csv` — Fixed Effects model metrics.
+- `model_results/predictions_fe.csv` — FE baseline predictions (when run with `--predict`).
+- `model_results/metrics_xgb.csv` — XGBoost model metrics.
+- `model_results/predictions_xgb.csv` — XGB baseline predictions (when run with `--predict`).
+- `model_results/scenario_xgb_10pct.csv` — XGB +10% GDP shock scenario results.
+- `model_results/compare_10years.csv` — Decade-to-decade comparison used for classification.
+
+Alternative FE pipeline (`models/fe_log_log_model.py`)
+- `model_results/fe/metrics.csv` — Metrics for the alternative FE log–log pipeline.
+- `model_results/fe/predictions_full.csv` — Full FE predictions across the panel.
+- `model_results/fe/elasticity_table.csv` — Elasticities (incl. +10% GDP table when requested).
+- `model_results/fe/scenario_gdp_plus10pct.csv` — FE +10% GDP scenario results.
+- `model_results/fe/model_summary.txt` — Text summary of the FE model fit.
+
+Classifier artifacts (`models/co2_classifier.py`)
+- `model_results/classifier/metrics_classifier.csv` — Metrics for Logit and XGB classifiers.
+- `model_results/classifier/logit_model.pkl` — Trained Logistic Regression model.
+- `model_results/classifier/xgb_classifier_model.json` — Trained XGBoost classifier.
+- `model_results/classifier/scaler.pkl` — Feature scaler used by the Logit pipeline.
+
+EV50 scenario (`models/ev50_scenario.py`)
+- `model_results/ev50/ev50_results.csv` — Estimated CO₂ impact by country.
+- `model_results/ev50/ev50_results_capped.csv` — Same as above with transport cap applied.
+- `model_results/ev50/ev50_sensitivity_capped.csv` — Sensitivity analysis under cap.
+- `model_results/ev50/ev50_top_abs.csv` — Top absolute emission reductions.
+- `model_results/ev50/ev50_top_pct.csv` — Top percentage emission reductions.
+
+Renewables investment scenario (`models/renew_invest_scenario.py`)
+- `model_results/renew/renew_5y_global_summary.csv` — Global 5‑year summary results.
+- `model_results/renew/renew_5y_country_results.csv` — Per‑country results for the 5‑year horizon.
+- `model_results/renew/renew_5y_priorities.csv` — Suggested priority list under the scenario.
 
 ---
 

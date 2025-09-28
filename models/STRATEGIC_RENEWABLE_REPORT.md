@@ -4,6 +4,23 @@
 
 **Method (high level).** We train an XGBoost model on ln-CO₂ using ln-GDP and energy controls; project each country 5 years ahead (CAGR); create a scenario with an additional *Δ share* in the chosen renewable technology; compare **baseline vs scenario**; convert the % reduction into a **probability of success**; and test marginal sensitivity (+5 pp) to prioritize **hydro vs non-hydro**.
 
+Inputs
+- `data/processed/wide_clean.csv`: panel with target and drivers.
+- Required columns: `EN.GHG.CO2.MT.CE.AR5` (CO₂), `NY.GDP.MKTP.CD` (GDP), optional controls (population, urban share, energy use, electricity mix shares).
+
+Method
+- Baseline projection: extend each country’s series 5 years via CAGR from historical values.
+- Model: fit XGBoost on log-transformed target/features from `models/co2_models.py` (`build_features`, `fit_xgb`).
+- Scenario: linearly ramp the chosen electricity mix share (`EG.ELC.RNEW.ZS` or `EG.ELC.HYRO.ZS`) by `renew_pp_total` over 5 years; reduce fossil shares proportionally to keep the mix bounded and renormalized.
+- Prediction: compare baseline vs. scenario mean CO₂ over 5 future years per country.
+- Probability: map reduction percent to a probability via a logistic calibration centered at 0%.
+- Prioritization: sensitivity with +5pp to hydro and +5pp to non‑hydro renewables; pick the tech yielding larger CO₂ reduction.
+
+Key Parameters
+- `--years` (int, default 5): horizon for projection.
+- `--renew_pp_total` (float, default 10.0): total increase (pp) in the chosen mix share over the horizon.
+- `--invest_target` (`EG.ELC.RNEW.ZS` | `EG.ELC.HYRO.ZS`): technology focus for the main scenario.
+- `--controls` (list): optional controls; script auto‑filters based on coverage.
 ---
 
 ## Global snapshot (5-year horizon)

@@ -4,6 +4,7 @@ import wbgapi as wbg
 import pandas as pd
 import argparse
 import os
+import logging
 
 SERIES = [
     # CO2
@@ -31,6 +32,9 @@ SERIES = [
 ]
 
 
+logger = logging.getLogger(__name__)
+
+
 def download_wdi(output_file: str, series: list=SERIES, start: int=1970, end: int=2024):
     """Descarga datos de WDI y los guarda en CSV."""
     df = wbg.data.DataFrame(series, time=range(start, end+1), labels=True,
@@ -47,10 +51,11 @@ def download_wdi(output_file: str, series: list=SERIES, start: int=1970, end: in
     out = df.merge(meta, on="iso3c", how="left")
     os.makedirs(os.path.dirname(output_file), exist_ok=True)
     out.to_csv(output_file, index=False)
-    print(f"✅ Datos descargados y guardados en {output_file}")
+    logger.info("Datos descargados y guardados en %s", output_file)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description="Descarga datos de WDI (CO2 + indicadores).")
     parser.add_argument("--output", type=str, default="data/raw_data/wb_co2_and_indicators.csv",
                         help="Ruta del archivo CSV de salida.")
@@ -61,4 +66,3 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     download_wdi(args.output, args.series, args.start, args.end)
-

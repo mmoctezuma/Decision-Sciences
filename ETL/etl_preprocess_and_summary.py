@@ -207,6 +207,7 @@ def compute_cagr(series):
     valid = series.dropna()
     if len(valid) < 2:
         return None
+    valid = valid.sort_index()
     start, end = valid.iloc[0], valid.iloc[-1]
     years = len(valid) - 1
     if start > 0 and end > 0 and years > 0:

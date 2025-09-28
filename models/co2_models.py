@@ -24,6 +24,7 @@ import pandas as pd
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import statsmodels.api as sm
 import xgboost as xgb
+import pickle
 
 try:
     from linearmodels.panel import PanelOLS
@@ -174,6 +175,11 @@ def main():
             cluster_entity=True, single_country=single_country
         )
         
+        fe_path = os.path.join(args.output_dir, "model_fe.pkl")
+        with open(fe_path, "wb") as f:
+            pickle.dump(res, f)
+        print(f"[FE] Modelo guardado en {fe_path}")
+        
         Xp_train = train.set_index(["iso3c", "year"]).sort_index()[res.model.exog.vars]
         yhat_train = res.predict(Xp_train)
         metrics_train = compute_metrics(train["ln_CO2"], yhat_train, "_train")
@@ -203,6 +209,10 @@ def main():
 
     else:  # XGB
         bst, features = fit_xgb(train, controls=args.controls)
+        
+        xgb_path = os.path.join(args.output_dir, "model_xgb.json")
+        bst.save_model(xgb_path)
+        print(f"[XGB] Modelo guardado en {xgb_path}")
 
         yhat_train = bst.predict(xgb.DMatrix(train[features]))
         metrics_train = compute_metrics(train["ln_CO2"], yhat_train, "_train")

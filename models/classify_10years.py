@@ -13,6 +13,7 @@ def compute_cagr(series):
     valid = series.dropna()
     if len(valid) < 2:
         return None
+    valid = valid.sort_index()
     start, end = valid.iloc[0], valid.iloc[-1]
     years = len(valid) - 1
     if start > 0 and end > 0 and years > 0:
@@ -23,15 +24,16 @@ def compute_cagr(series):
 
 def project_series(series, years=10):
     g = compute_cagr(series)
-    if g is None:
-        return pd.Series([np.nan]*years, 
+    if g is None or not np.isfinite(g):
+        return pd.Series([np.nan]*years,
                          index=range(series.index[-1]+1, series.index[-1]+years+1))
     projections = [series.iloc[-1] * ((1+g)**i) for i in range(1, years+1)]
-    return pd.Series(projections, 
+    return pd.Series(projections,
                      index=range(series.index[-1]+1, series.index[-1]+years+1))
 
 
 def extend_country(df_country, years=10):
+    df_country = df_country.sort_values("year")
     results = []
     for col in df_country.columns:
         if col in ["iso3c", "Country", "year", "region"]:
@@ -41,29 +43,35 @@ def extend_country(df_country, years=10):
             proj = project_series(series, years)
             proj.name = col
             results.append(proj)
-    if results:
-        df_proj = pd.concat(results, axis=1)
-        df_proj = df_proj.reset_index().rename(columns={"index": "year"})
-        df_proj["iso3c"] = df_country["iso3c"].iloc[0]
-        df_proj["Country"] = df_country["Country"].iloc[0]
-        return df_proj
-    return None
+    if not results:
+        return None
+    df_proj = pd.concat(results, axis=1).reset_index().rename(columns={"index": "year"})
+    df_proj["iso3c"] = df_country["iso3c"].iloc[0]
+    df_proj["Country"] = df_country["Country"].iloc[0]
+    if "region" in df_country.columns:
+        df_proj["region"] = df_country["region"].iloc[0]
+    return df_proj
 
+
+def extended_data(df, years=10):
+    extended_rows = []
+    for iso, group in df.groupby("iso3c"):
+        res = extend_country(group, years=years)
+        if res is not None and not res.empty:
+            extended_rows.append(res)
+    if not extended_rows:
+        return pd.DataFrame()
+    return pd.concat(extended_rows, ignore_index=True)
 
 # =========================
 #  MAIN
 # =========================
-def main(input_file, output_file_compare, output_file_df, target, gdp, controls):
+def main(input_file, output_file_compare, output_file_df, target, gdp, controls, years):
     df = load_panel(input_file)
     X, ln_controls = build_features(df, target=target, gdp=gdp, controls=controls)
     bst, features = fit_xgb(X, controls=controls)
     
-    extended_data = []
-    for iso, group in df.groupby("iso3c"):
-        res = extend_country(group, years=10)
-        if res is not None and not res.empty:
-            extended_data.append(res)
-    future_df = pd.concat(extended_data, ignore_index=True)
+    future_df = extended_data(df, years=10)
     
     future_X, _ = build_features(future_df, target=target, gdp=gdp, controls=controls)
     dmat_future = xgb.DMatrix(future_X[features])
@@ -109,7 +117,8 @@ if __name__ == "__main__":
     parser.add_argument("--target", default="EN.GHG.CO2.MT.CE.AR5", help="Variable target CO2")
     parser.add_argument("--gdp", default="NY.GDP.MKTP.CD", help="Variable PIB")
     parser.add_argument("--controls", nargs="+", default=['SP.POP.TOTL', 'SP.URB.TOTL.IN.ZS', 'EG.FEC.RNEW.ZS'], help="Variables de control")
+    parser.add_argument("--years", default=10, help="Años a futuro")
     args = parser.parse_args()
 
-    main(args.input_file, args.output_file_compare, args.output_file_df, args.target, args.gdp, args.controls)
+    main(args.input_file, args.output_file_compare, args.output_file_df, args.target, args.gdp, args.controls, args.years)
 

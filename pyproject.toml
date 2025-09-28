@@ -1,0 +1,20 @@
+[project]
+name = "decision-sciences"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "linearmodels>=6.1",
+    "pandas>=2.3.2",
+    "pandas-datareader>=0.10.0",
+    "pycountry>=24.6.1",
+    "requests>=2.32.5",
+    "scikit-learn>=1.7.2",
+    "scipy>=1.16.2",
+    "shap>=0.48.0",
+    "statsmodels>=0.14.5",
+    "wbdata>=1.0.0",
+    "wbgapi>=1.0.12",
+    "xgboost>=3.0.5",
+]

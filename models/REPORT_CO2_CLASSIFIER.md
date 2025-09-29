@@ -9,7 +9,7 @@ This deliverable documents the scripts, data products, methodology, results, and
 
 1) **Target construction (projection-based label)** — builds `likely_reduce_CO2` using decade projections and saves comparison and labeled panel:
 ```bash
-python classify_10years.py \
+python -m models.classify_10years \
   --input_file data/processed/wide_clean.csv \
   --output_file_compare model_results/10years/compare_10years.csv \
   --output_file_df data/processed/panel_target.csv \
@@ -20,7 +20,7 @@ python classify_10years.py \
 
 2) **Classifier training & evaluation** — trains **Logistic Regression (L1)** and **XGBoost** with temporal validation and saves metrics/artifacts:
 ```bash
-python co2_classifier.py \
+python -m models.co2_classifier \
   --input_file data/processed/panel_target.csv \
   --output_dir model_results/classifier \
   --features EG.ELC.COAL.ZS EG.ELC.HYRO.ZS EG.ELC.NGAS.ZS EG.ELC.PETR.ZS EG.ELC.RNEW.ZS \

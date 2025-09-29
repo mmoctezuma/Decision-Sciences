@@ -23,6 +23,20 @@ Key Parameters
 - `--controls` (list): optional controls; script auto‑filters based on coverage.
 ---
 
+```bash
+python -m models.classify_10years \
+  --input_file data/processed/wide_clean.csv \
+  --output_file_compare model_results/compare_10years.csv \
+  --output_file_df data/processed/panel_target.csv \
+  --target EN.GHG.CO2.MT.CE.AR5 \
+  --gdp NY.GDP.MKTP.CD \
+  --controls SP.POP.TOTL SP.URB.TOTL.IN.ZS EG.USE.PCAP.KG.OE
+```
+
+---
+
+## How to Run
+
 ## Global snapshot (5-year horizon)
 - Countries evaluated: **181**
 - Avg. reduction across countries: **4.87%**

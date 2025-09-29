@@ -42,12 +42,13 @@ _Alternatives considered:_ Random Forest (robust yet typically behind XGB here);
 - **SHAP/PDP** for global and local explanations of non‑linear drivers.
 
 ## How to Reproduce
+In the script the percentage in the scenario can be change
 ```bash
 # FE with baseline predictions and metrics
-python co2_models.py --input_file <wide_clean.csv> --output_dir <out>   --model_type fe --split_year 2015 --predict
+python -m models.co2_models --input_file <wide_clean.csv> --output_dir <out>   --model_type fe --split_year 2015 --predict
 
 # XGB with +10% GDP scenario and metrics
-python co2_models.py --input_file <wide_clean.csv> --output_dir <out>   --model_type xgb --split_year 2015 --shock_pct 10
+python -m models.co2_models --input_file <wide_clean.csv> --output_dir <out>   --model_type xgb --split_year 2015 --shock_pct 10
 ```
 
 ## Model Performance

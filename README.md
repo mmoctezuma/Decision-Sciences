@@ -99,7 +99,7 @@ You can run the ETL script in different modes depending on your needs:
 
 #### Case 1: Only generate a summary of the raw data  
 ```bash
-python ETL/etl_preprocess_and_summary.py \
+python -m ETL.etl_preprocess_and_summary \
   --input data/raw_data/wb_co2_and_indicators.csv \
   --workdir data/processed \
   --stage summarize
@@ -107,7 +107,7 @@ python ETL/etl_preprocess_and_summary.py \
 
 #### Case 2: Preprocess data with winsorization and recommendations  
 ```bash
-python ETL/etl_preprocess_and_summary.py \
+python -m ETL.etl_preprocess_and_summary \
   --input data/raw_data/wb_co2_and_indicators.csv \
   --workdir data/processed \
   --stage preprocess \
@@ -118,7 +118,7 @@ python ETL/etl_preprocess_and_summary.py \
 
 #### Case 3: Full pipeline with a focus year  
 ```bash
-python ETL/etl_preprocess_and_summary.py \
+python -m ETL.etl_preprocess_and_summary \
   --input data/raw_data/wb_co2_and_indicators.csv \
   --workdir data/processed \
   --start 1990 --end 2023 --focus_year 2023 \
@@ -130,28 +130,56 @@ python ETL/etl_preprocess_and_summary.py \
 
 ```bash
 # Fixed Effects & XGBoost
-python models/co2_models.py \
+python -m models.co2_models \
   --input_file data/processed/wide_clean.csv \
   --output_dir model_results \
   --model_type fe --split_year 2020 --predict
 
-python models/co2_models.py \
+python -m models.co2_models \
+  --input_file data/processed/wide_clean.csv \
+  --output_dir model_results \
+  --model_type xgb --split_year 2020 --predict
+```
+
+For the +10% GDP scenario
+
+```bash
+# Fixed Effects & XGBoost
+python -m models.co2_models \
+  --input_file data/processed/wide_clean.csv \
+  --output_dir model_results \
+  --model_type fe --split_year 2020 --shock_pct 10
+
+python -m models.co2_models \
   --input_file data/processed/wide_clean.csv \
   --output_dir model_results \
   --model_type xgb --split_year 2020 --shock_pct 10
+  
+# Single country example (Mexico)
+python -m models.co2_models \
+  --input_file data/processed/wide_clean.csv \
+  --output_dir model_results \
+  --model_type fe --split_year 2020 \
+  --country MEX --shock_pct 10
+
+python -m models.co2_models \
+  --input_file data/processed/wide_clean.csv \
+  --output_dir model_results \
+  --model_type xgb --split_year 2020 \
+  --country MEX --shock_pct 10
 ```
 
 Alternative FE pipeline (log–log), with additional artifacts and optional per‑country run:
 
 ```bash
 # All countries, with time effects and +10% GDP elasticity table
-python models/fe_log_log_model.py \
+python -m models.fe_log_log_model \
   --input_file data/processed/wide_clean.csv \
   --output_dir model_results/fe \
   --time_effects --shock_pct 10
 
 # Single country example (Mexico), using last available year as base
-python models/fe_log_log_model.py \
+python -m models.fe_log_log_model \
   --input_file data/processed/wide_clean.csv \
   --output_dir model_results/fe \
   --country MEX --time_effects --shock_pct 10
@@ -162,7 +190,7 @@ python models/fe_log_log_model.py \
 Estimate CO₂ reductions if 50% of fleet shifts to EVs (uses electricity mix, fleet and adoption data).
 
 ```bash
-python models/ev50_scenario.py \
+python -m models.ev50_scenario \
   --wide_csv data/processed/wide_clean.csv \
   --ev_csv data/ev_adoption_v2.csv \
   --outdir model_results/ev50 \
@@ -208,7 +236,7 @@ python models/positive_and_shap_tables.py \
 ### 6. Final classifier (Logit + XGB)
 
 ```bash
-python models/co2_classifier.py \
+python -m models.co2_classifier \
   --input_file data/processed/panel_target.csv \
   --output_dir model_results/classifier \
   --features EN.GHG.CO2.MT.CE.AR5 NY.GDP.PCAP.CD SP.POP.TOTL EG.USE.PCAP.KG.OE EG.FEC.RNEW.ZS
@@ -219,7 +247,7 @@ python models/co2_classifier.py \
 Simulate a planned increase in the electricity mix share for renewables or hydro over 5 years, compare against a baseline projection, and produce country-level prioritization.
 
 ```bash
-python models/renew_invest_scenario.py \
+python -m models.renew_invest_scenario \
   --input_file data/processed/wide_clean.csv \
   --output_dir model_results/renew \
   --years 5 \

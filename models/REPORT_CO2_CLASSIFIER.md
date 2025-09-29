@@ -175,33 +175,3 @@ If `delta` is present, more negative values indicate **stronger projected reduct
 | WSM     | -0.0100859  |
 | ZAF     | -0.2192     |
 | ZWE     | -0.234964   |
-
-
-
-## Interpretability (SHAP) & Regional Policy Playbooks
-
-**Goal.** Explain the classifier's decisions and summarize **actionable levers** by region.
-
-### How to compute SHAP values (XGBoost)
-1. Load your trained XGB model (`xgb_classifier_model.json`) and the test set used in evaluation.
-2. Use `shap.TreeExplainer(model).shap_values(X_test)` to obtain per-feature attributions.
-3. Produce:
-   - **Global** plots: `summary_plot`, `bar_plot` (top drivers overall).
-   - **Local** plots: `force_plot` for specific countries/years to see **why** the model predicts reduction.
-
-### Translating SHAP insights into policies
-- If **renewables share** and **declining coal share** are top positive drivers → set clear auction pipelines and coal retirement schedules.
-- If **energy intensity** declining drives positives → focus on industrial efficiency and building codes.
-- If **land-use CO₂** reduction is pivotal → prioritize forestry and agroforestry programs.
-
-### Regional playbooks (template)
-- **Baseline signal:** review the top 3 SHAP features in each region (median across countries in region).
-- **Policy levers:** map each top feature to 1–2 concrete actions suitable for local institutions, grid state, and fiscal space.
-
-_Example mapping:_
-- **Latin America:** renewables expansion + land-use protection; electrify buses where grids are green.
-- **Europe & Central Asia:** efficiency retrofits in buildings; accelerate coal-to-gas/renewables substitution.
-- **East Asia & Pacific:** grid decarbonization plus industrial efficiency; market mechanisms for heavy industry.
-- **Sub-Saharan Africa:** add clean capacity with concessional finance; limit diesel fallback with mini-grids.
-- **MENA:** large-scale solar/wind and efficiency in water/pumping; EVs for fleets and logistics.
-- **North America:** deep retrofits and heat pumps; transmission build-out to integrate renewables.

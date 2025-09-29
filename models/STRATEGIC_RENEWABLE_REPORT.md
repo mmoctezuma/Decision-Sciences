@@ -50,23 +50,23 @@ python -m models.classify_10years \
 ## Ranked list A — Highest likelihood of reduction (Top 15)
 (Countries sorted by **probability**, then by **% reduction**)
 
-| ISO3 | Country | Region | Prob. (%) | ΔCO₂% (5y) | Grid gCO₂/kWh |
-|---|---|---|---:|---:|---:|
-| PRI | Puerto Rico (US) | nan | 95.1 | -37.18 | 441 |
-| BLZ | Belize | nan | 94.9 | -36.52 | 68 |
-| GUM | Guam | nan | 94.1 | -34.51 | 663 |
-| LSO | Lesotho | nan | 93.6 | -33.60 | 52 |
-| PNG | Papua New Guinea | nan | 89.7 | -26.99 | 284 |
-| BRA | Brazil | nan | 88.4 | -25.34 | 66 |
-| VIR | Virgin Islands (U.S.) | nan | 87.4 | -24.19 | 681 |
-| ZMB | Zambia | nan | 86.5 | -23.27 | 89 |
-| FRO | Faroe Islands | nan | 86.4 | -23.10 | 369 |
-| LUX | Luxembourg | nan | 84.7 | -21.34 | 46 |
-| BRB | Barbados | nan | 82.4 | -19.32 | 644 |
-| VCT | St. Vincent and the Grenadines | nan | 82.3 | -19.23 | 541 |
-| LCA | St. Lucia | nan | 80.6 | -17.76 | 681 |
-| PAK | Pakistan | nan | 76.6 | -14.81 | 339 |
-| HKG | Hong Kong SAR, China | nan | 75.7 | -14.23 | 677 |
+| ISO3 | Country | Prob. (%) | ΔCO₂% (5y) | Grid gCO₂/kWh |
+|---|---|---:|---:|---:|
+| PRI | Puerto Rico (US) | 95.1 | -37.18 | 441 |
+| BLZ | Belize | 94.9 | -36.52 | 68 |
+| GUM | Guam | 94.1 | -34.51 | 663 |
+| LSO | Lesotho | 93.6 | -33.60 | 52 |
+| PNG | Papua New Guinea | 89.7 | -26.99 | 284 |
+| BRA | Brazil | 88.4 | -25.34 | 66 |
+| VIR | Virgin Islands (U.S.) 87.4 | -24.19 | 681 |
+| ZMB | Zambia | 86.5 | -23.27 | 89 |
+| FRO | Faroe Islands | 86.4 | -23.10 | 369 |
+| LUX | Luxembourg | 84.7 | -21.34 | 46 |
+| BRB | Barbados | 82.4 | -19.32 | 644 |
+| VCT | St. Vincent and the Grenadines | 82.3 | -19.23 | 541 |
+| LCA | St. Lucia | 80.6 | -17.76 | 681 |
+| PAK | Pakistan | 76.6 | -14.81 | 339 |
+| HKG | Hong Kong SAR, China | 75.7 | -14.23 | 677 |
 
 
 ---
@@ -74,23 +74,23 @@ python -m models.classify_10years \
 ## Ranked list B — Largest absolute CO₂ cuts (Mt, Top 15)
 (Countries with **biggest absolute drop** regardless of probability)
 
-| ISO3 | Country | Region | ΔCO₂ (Mt) | ΔCO₂% (5y) | Prob. (%) |
-|---|---|---:|---:|---:|---:|
-| BRA | Brazil | nan | 112.53 | -25.34 | 88.4 |
-| IND | India | nan | 68.99 | -1.74 | 53.5 |
-| PAK | Pakistan | nan | 68.41 | -14.81 | 76.6 |
-| KOR | Korea, Rep. | nan | 48.42 | -7.72 | 65.0 |
-| FRA | France | nan | 38.91 | -7.04 | 63.7 |
-| COL | Colombia | nan | 30.04 | -13.14 | 74.1 |
-| GBR | United Kingdom | nan | 28.85 | -8.11 | 65.7 |
-| ZAF | South Africa | nan | 15.29 | -3.01 | 56.0 |
-| DZA | Algeria | nan | 15.17 | -5.66 | 61.1 |
-| MAR | Morocco | nan | 14.14 | -6.59 | 62.9 |
-| TUR | Turkiye | nan | 13.41 | -3.26 | 56.5 |
-| MEX | Mexico | nan | 12.07 | -1.50 | 53.0 |
-| PRI | Puerto Rico (US) | nan | 11.77 | -37.18 | 95.1 |
-| THA | Thailand | nan | 9.36 | -3.13 | 56.2 |
-| JPN | Japan | nan | 8.43 | -1.01 | 52.0 |
+| ISO3 | Country | ΔCO₂ (Mt) | ΔCO₂% (5y) | Prob. (%) |
+|---|---|---:|---:|---:|
+| BRA | Brazil | 112.53 | -25.34 | 88.4 |
+| IND | India | 68.99 | -1.74 | 53.5 |
+| PAK | Pakistan | 68.41 | -14.81 | 76.6 |
+| KOR | Korea, Rep. | 48.42 | -7.72 | 65.0 |
+| FRA | France | 38.91 | -7.04 | 63.7 |
+| COL | Colombia | 30.04 | -13.14 | 74.1 |
+| GBR | United Kingdom | 28.85 | -8.11 | 65.7 |
+| ZAF | South Africa | 15.29 | -3.01 | 56.0 |
+| DZA | Algeria | 15.17 | -5.66 | 61.1 |
+| MAR | Morocco | 14.14 | -6.59 | 62.9 |
+| TUR | Turkiye | 13.41 | -3.26 | 56.5 |
+| MEX | Mexico | 12.07 | -1.50 | 53.0 |
+| PRI | Puerto Rico (US) | 11.77 | -37.18 | 95.1 |
+| THA | Thailand | 9.36 | -3.13 | 56.2 |
+| JPN | Japan | 8.43 | -1.01 | 52.0 |
 
 
 ---
@@ -146,4 +146,4 @@ We compute marginal sensitivity (+5 pp) for **hydro** and **non-hydro renewables
 ### Notes & limitations
 - This is a **reduced-form, system-level** model; it does not endogenize demand-side efficiency, hydro seasonality, or sub-national siting.
 - Results depend on **data coverage** and on the assumed **Δ share ramp** across five years.
-- For executive decisions, complement with **project-level LCOE**, grid constraints, and social/environmental risk screenings.
+- For executive decisions, complement with grid constraints, and social/environmental risk screenings.

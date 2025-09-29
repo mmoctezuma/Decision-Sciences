@@ -95,26 +95,6 @@ python ETL/download_from_WDI.py \
 
 ### 2. ETL
 
-### Tables and SHAP summaries (optional)
-
-Produce positive-class and regional share tables from the 10‑year comparison; optionally compute SHAP global importance (requires xgboost + shap):
-
-```bash
-# From decade comparison
-python models/positive_and_shap_tables.py \
-  --compare_csv model_results/compare_10years.csv \
-  --outdir model_results/classifier \
-  --positive_table --regional_share
-
-# With SHAP global importance (requires test features)
-python models/positive_and_shap_tables.py \
-  --compare_csv model_results/compare_10years.csv \
-  --outdir model_results/classifier \
-  --add_shap \
-  --xgb_model_path model_results/classifier/xgb_classifier_model.json \
-  --x_test_csv path/to/X_test.csv
-```
-
 You can run the ETL script in different modes depending on your needs:
 
 #### Case 1: Only generate a summary of the raw data  
@@ -193,7 +173,48 @@ python models/ev50_scenario.py \
 Outputs in `model_results/ev50/`:
 - `ev50_results.csv`, `ev50_results_capped.csv`, `ev50_sensitivity_capped.csv`, `ev50_top_abs.csv`, `ev50_top_pct.csv`
 
-### 5. Renewables investment (5-year scenario)
+### 5. 10-year classification
+
+```bash
+python -m models.classify_10years \
+  --input_file data/processed/wide_clean.csv \
+  --output_file_compare model_results/compare_10years.csv \
+  --output_file_df data/processed/panel_target.csv \
+  --target EN.GHG.CO2.MT.CE.AR5 \
+  --gdp NY.GDP.MKTP.CD \
+  --controls SP.POP.TOTL SP.URB.TOTL.IN.ZS EG.USE.PCAP.KG.OE
+```
+
+### Tables and SHAP (optional)
+
+Produce positive-class and regional share tables from the 10‑year comparison; optionally compute SHAP global importance (requires xgboost + shap):
+
+```bash
+# From decade comparison
+python models/positive_and_shap_tables.py \
+  --compare_csv model_results/compare_10years.csv \
+  --outdir model_results/classifier \
+  --positive_table --regional_share
+
+# With SHAP global importance (requires test features)
+python models/positive_and_shap_tables.py \
+  --compare_csv model_results/compare_10years.csv \
+  --outdir model_results/classifier \
+  --add_shap \
+  --xgb_model_path model_results/classifier/xgb_classifier_model.json \
+  --x_test_csv path/to/X_test.csv
+```
+
+### 6. Final classifier (Logit + XGB)
+
+```bash
+python models/co2_classifier.py \
+  --input_file data/processed/panel_target.csv \
+  --output_dir model_results/classifier \
+  --features EN.GHG.CO2.MT.CE.AR5 NY.GDP.PCAP.CD SP.POP.TOTL EG.USE.PCAP.KG.OE EG.FEC.RNEW.ZS
+```
+
+### 7. Renewables investment (5-year scenario)
 
 Simulate a planned increase in the electricity mix share for renewables or hydro over 5 years, compare against a baseline projection, and produce country-level prioritization.
 
@@ -213,29 +234,6 @@ Outputs in `model_results/renew/`:
 - `renew_5y_country_results.csv` — Baseline vs scenario CO₂, reduction%, probability.
 - `renew_5y_priorities.csv` — Country-level tech prioritization (hydro vs non-hydro renewables).
 - `renew_5y_global_summary.csv` — Global summary and scenario parameters.
-
-Details: see `models/REPORT_RENEW_SCENARIO.md`.
-
-### 6. 10-year classification
-
-```bash
-python -m models.classify_10years \
-  --input_file data/processed/wide_clean.csv \
-  --output_file_compare model_results/compare_10years.csv \
-  --output_file_df data/processed/panel_target.csv \
-  --target EN.GHG.CO2.MT.CE.AR5 \
-  --gdp NY.GDP.MKTP.CD \
-  --controls SP.POP.TOTL SP.URB.TOTL.IN.ZS EG.USE.PCAP.KG.OE
-```
-
-### 7. Final classifier (Logit + XGB)
-
-```bash
-python models/co2_classifier.py \
-  --input_file data/processed/panel_target.csv \
-  --output_dir model_results/classifier \
-  --features EN.GHG.CO2.MT.CE.AR5 NY.GDP.PCAP.CD SP.POP.TOTL EG.USE.PCAP.KG.OE EG.FEC.RNEW.ZS
-```
 
 ---
 

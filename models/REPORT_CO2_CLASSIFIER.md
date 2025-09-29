@@ -33,6 +33,12 @@ Artifacts:
 - `model_results/classifier/metrics_classifier.csv`
 - `model_results/classifier/logit_model.pkl`, `xgb_classifier_model.json`
 
+Reproducibility & Files:
+
+- `classify_10years.py` — builds labels and comparison table (`compare_10years.csv`) and outputs a labeled panel (`panel_target.csv`).
+- `co2_classifier.py` — trains/evaluates models and saves `metrics_classifier.csv` and model artifacts.
+- Make sure `data/processed/wide_clean.csv` is produced by your ETL pipeline before running step (1).
+
 ## Methodology
 
 ### 1) Target definition
@@ -56,10 +62,10 @@ We evaluate with multiple **time splits** (e.g., 2000, 2005, 2010): train up to 
 
 ## Label Snapshot
 
-    - Countries covered in `compare_10years.csv`: **200**
-    - Share labeled **likely_reduce_CO2 = 1**: **22.5%**
+- Countries covered in `compare_10years.csv`: **200**
+- Share labeled **likely_reduce_CO2 = 1**: **22.5%**
 
-    **Top 10 strongest projected reducers** (most negative `delta` in mean ln(CO₂)`):
+**Top 10 strongest projected reducers** (most negative `delta` in mean ln(CO₂)`):
 | iso3c   |     delta |
 |:--------|----------:|
 | SYC     | -1.85439  |
@@ -73,7 +79,7 @@ We evaluate with multiple **time splits** (e.g., 2000, 2005, 2010): train up to 
 | CAN     | -0.681664 |
 | BGR     | -0.428883 |
 
-    **Top 10 projected increasers** (most positive `delta`):
+**Top 10 projected increasers** (most positive `delta`):
 | iso3c   |   delta |
 |:--------|--------:|
 | GUM     | 3.7018  |
@@ -199,9 +205,3 @@ _Example mapping:_
 - **Sub-Saharan Africa:** add clean capacity with concessional finance; limit diesel fallback with mini-grids.
 - **MENA:** large-scale solar/wind and efficiency in water/pumping; EVs for fleets and logistics.
 - **North America:** deep retrofits and heat pumps; transmission build-out to integrate renewables.
-
-## Reproducibility & Files
-
-- `classify_10years.py` — builds labels and comparison table (`compare_10years.csv`) and outputs a labeled panel (`panel_target.csv`).
-- `co2_classifier.py` — trains/evaluates models and saves `metrics_classifier.csv` and model artifacts.
-- Make sure `data/processed/wide_clean.csv` is produced by your ETL pipeline before running step (1).
